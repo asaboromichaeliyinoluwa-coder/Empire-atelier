@@ -1,0 +1,16 @@
+# One-click deploy on Render (https://render.com): New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: empire-atelier
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/status
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: YOUCAM_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
