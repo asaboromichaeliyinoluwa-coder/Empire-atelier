@@ -99,11 +99,10 @@ async function api(req: IncomingMessage, res: ServerResponse, path: string) {
   if (req.method === 'POST' && path === '/api/tryon') {
     const body = await readJson(req);
     const product = productById(String(body.productId ?? ''));
-    if (!product?.garment) throw new YouCamError('This piece can’t be tried on', 400);
-    const source = validImage(body.source);
-    // Products with a real product shot send its URL; illustrated ones send the rendered artwork.
-    const garmentImage = product.tryOnImage ? { url: product.tryOnImage } : validImage(body.garmentImage);
-    const garment = GARMENTS.has(body.garment) ? body.garment : product.garment;
+   const garment = GARMENTS.has(body.garment) ? body.garment : product?.garment;
+if (!garment) throw new YouCamError('This piece can’t be tried on', 400);
+const source = validImage(body.source);
+const garmentImage = product?.tryOnImage && /^https:\/\//.test(product.tryOnImage) ? { url: product.tryOnImage } : validImage(body.garmentImage);
     if (!youcamConfigured()) return send(res, 200, { demo: true });
     return send(res, 200, { taskId: await createTryOn(source, garmentImage, garment) });
   }
