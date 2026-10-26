@@ -3,12 +3,12 @@
 set -euo pipefail
 OUT="${1:?output dir}"
 rm -rf dist-artifact
-VITE_TARGET=artifact VITE_MEDIAPIPE_BASE=./mediapipe VITE_MEDIAPIPE_MODEL_EXT=.task.wasm npx vite build --base ./ --outDir dist-artifact >/dev/null
+VITE_PACK_EXT=.wasm VITE_TARGET=artifact VITE_MEDIAPIPE_BASE=./mediapipe VITE_MEDIAPIPE_MODEL_EXT=.task.wasm npx vite build --base ./ --outDir dist-artifact >/dev/null
 mkdir -p dist-artifact/mediapipe/wasm
 cp node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_internal.{js,wasm} dist-artifact/mediapipe/wasm/
 curl -sf -o dist-artifact/mediapipe/pose_landmarker.task.wasm https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
 rm -rf "${OUT:?}"; mkdir -p "$OUT"
-cp -r dist-artifact/assets dist-artifact/mediapipe "$OUT"/
+cp -r dist-artifact/assets dist-artifact/mediapipe dist-artifact/photos dist-artifact/real "$OUT"/
 CSS=$(cd dist-artifact && ls assets/*.css); JS=$(cd dist-artifact && ls assets/index-*.js)
 {
   echo '<title>Empire Atelier</title>'
@@ -19,3 +19,5 @@ CSS=$(cd dist-artifact && ls assets/*.css); JS=$(cd dist-artifact && ls assets/i
   echo "<script type=\"module\" src=\"./$JS\"></script>"
 } > "$OUT/empire-atelier.html"
 rm "${OUT:?}/${CSS:?}"
+# the preview host serves only known file types: photo packs travel as .wasm (opaque binary)
+for f in "$OUT"/photos/*.pack; do mv "$f" "${f%.pack}.wasm"; done

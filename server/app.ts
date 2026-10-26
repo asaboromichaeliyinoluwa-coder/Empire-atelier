@@ -7,6 +7,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { productById } from '../src/shared/catalog.ts';
 import { cleanContext } from '../src/shared/stylist.ts';
+import { AccountError, accountsMode, deleteAccount, googleLogin, loadData, logIn, me, phoneStart, phoneVerify, providers, saveData, signUp, updateProfile } from './accounts.ts';
+import { claimShop, deleteProduct, ownerStatus, publicShop, saveProduct, saveSettings, sendPhoto } from './shop.ts';
 import { askStylist, stylistConfigured } from './stylist.ts';
 import { createTemplateChange, createTryOn, getTask, listTemplates, youcamConfigured, YouCamError, type ImageInput } from './youcam.ts';
 
@@ -39,7 +41,31 @@ function validImage(x: any): ImageInput {
 }
 
 async function api(req: IncomingMessage, res: ServerResponse, path: string) {
-  if (req.method === 'GET' && path === '/api/status') return send(res, 200, { youcam: youcamConfigured(), stylist: stylistConfigured() });
+  if (req.method === 'GET' && path === '/api/status') return send(res, 200, { youcam: youcamConfigured(), stylist: stylistConfigured(), accounts: accountsMode(), shop: accountsMode() !== 'none', ...providers() });
+
+  // Accounts
+  const auth = req.headers.authorization;
+  if (req.method === 'POST' && path === '/api/auth/signup') return send(res, 201, await signUp(await readJson(req)));
+  if (req.method === 'POST' && path === '/api/auth/login') return send(res, 200, await logIn(await readJson(req)));
+  if (req.method === 'POST' && path === '/api/auth/google') return send(res, 200, await googleLogin(await readJson(req)));
+  if (req.method === 'POST' && path === '/api/auth/phone/start') return send(res, 200, await phoneStart(await readJson(req)));
+  if (req.method === 'POST' && path === '/api/auth/phone/verify') return send(res, 200, await phoneVerify(await readJson(req)));
+  if (req.method === 'GET' && path === '/api/auth/me') return send(res, 200, { user: await me(auth) });
+  if (req.method === 'POST' && path === '/api/auth/profile') return send(res, 200, { user: await updateProfile(auth, await readJson(req)) });
+  if (req.method === 'POST' && path === '/api/auth/delete') return send(res, 200, await deleteAccount(auth, await readJson(req)));
+  if (req.method === 'GET' && path === '/api/account/data') return send(res, 200, { data: await loadData(auth) });
+  if (req.method === 'PUT' && path === '/api/account/data') return send(res, 200, await saveData(auth, (await readJson(req)).data));
+
+  // The shop owner's own products
+  if (req.method === 'GET' && path === '/api/shop') return send(res, 200, await publicShop());
+  const photo = /^\/api\/shop\/img\/([\w-]+)$/.exec(path);
+  if (req.method === 'GET' && photo) return sendPhoto(res, photo[1]);
+  if (req.method === 'GET' && path === '/api/shop/owner') return send(res, 200, await ownerStatus(auth));
+  if (req.method === 'POST' && path === '/api/shop/claim') return send(res, 200, await claimShop(auth));
+  if (req.method === 'PUT' && path === '/api/shop/settings') return send(res, 200, { settings: await saveSettings(auth, await readJson(req)) });
+  if (req.method === 'POST' && path === '/api/shop/product') return send(res, 200, { product: await saveProduct(auth, await readJson(req)) });
+  const delProduct = /^\/api\/shop\/product\/([\w-]+)$/.exec(path);
+  if (req.method === 'DELETE' && delProduct) return send(res, 200, await deleteProduct(auth, delProduct[1]));
 
   if (req.method === 'POST' && path === '/api/stylist') {
     const body = await readJson(req);
@@ -94,14 +120,14 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse, path:
     const origin = req.headers.origin;
     if (origin && APP_ORIGINS.has(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.setHeader('Vary', 'Origin');
       if (req.method === 'OPTIONS') return void res.writeHead(204).end();
     }
     await api(req, res, path);
   } catch (err) {
-    if (err instanceof YouCamError) return send(res, err.status, { error: err.message });
+    if (err instanceof YouCamError || err instanceof AccountError) return send(res, err.status, { error: err.message });
     console.error(err);
     // Network failures to YouCam surface as TypeError("fetch failed").
     const offline = err instanceof TypeError && /fetch failed/.test(err.message);

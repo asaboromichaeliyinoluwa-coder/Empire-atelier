@@ -47,6 +47,43 @@ everyday) a layer. Each look is scored on the shopper's styles, colours and occa
 its colours clash or it breaks the budget, and the best varied set is shown with the reasons it was
 picked. Editors' looks are hand-picked combinations in the same file.
 
+## Real products and photos
+
+Add your own items with your own photos on the **My products** page (`/admin`, footer link). See `MY-PRODUCTS.md` for
+step-by-step instructions. Three items photographed by the owner are already in the shop (`src/shared/real-products.ts`);
+their prices and sizes are placeholders to edit. The studio-rendered catalogue (below) stays alongside and is always
+labelled as a render, not a photograph. `npm run photos` re-renders it (`tools/render/`).
+
+## Luxury houses, galleries and labelling
+
+Six original, fictional luxury houses sit beside the boutiques (`src/shared/luxury.ts`): Atelier Vermeil (saddle leather,
+silk twill, watches), Casa Aurelia (baroque gold, jewellery), Noir Brut (oversized street couture), Studio Prisma (technical
+nylon), Malle & Voyage (chevron-canvas trunks and travel bags) and Giardino (garden greens, striped webbing). Their look is
+inspired by the houses named in the brief; every name, product and drawing is original, and the app says so wherever they
+appear. They have no logos, names or trademarked patterns and are not affiliated with any real brand.
+
+- **Catalogue:** bags and travel bags, sneakers, loafers and formal shoes, jackets, shirts and dresses, plus a new
+  **Watches & jewellery** category (watches, pendants, cuffs, rings, belts, sunglasses, wallets). Colour and size options, prices and specifications on every page.
+- **Gallery:** each product page has four views (front, close-up, back, material swatch) with hover zoom, all drawn from
+  the same artwork with polished-metal, nylon, leather, suede, satin and denim finishes. They are labelled "Original illustration, not a photograph".
+- **Shop:** filter by luxury house, boutique, category, colour, style, occasion and budget; search; sort by style match,
+  price, newest, sale or name; loading, empty and error states.
+- **Try-on labelling:** the try-on stage shows "Real result, rendered by YouCam AI" only for a real YouCam render, and
+  "On-device preview, an illustrated mockup" otherwise. Shoes, bags and accessories are not tried on and say so.
+- **Real photos:** to use authorised product photography, set `image` (and `tryOnImage`) on a product in `catalog.ts`;
+  the gallery then shows the photo and labels it "Product photo".
+- **Tests:** `npm test` checks every product, seller, category and drawing (four views each).
+
+## The Maison edit
+
+The Maison Lumière collection (`maison-lumiere` in `src/shared/catalog.ts`) holds original,
+luxury-inspired designs: monogram canvas, quilting, baroque silks, houndstooth, house check and
+heritage stripe prints; oversized streetwear; saddle-leather bags and slippers; silk carrés. They are
+drawn with material finishes (leather, suede, satin, denim, knit, wool, linen, canvas) chosen from each
+piece's `material` text (`finishFor` in `src/shared/garments.ts`). They are inspired by the look of
+houses such as Louis Vuitton, Gucci, Balenciaga and Hermès, but use no logos, names or trademarked
+patterns, and the app says so wherever they appear.
+
 ## On phones
 
 Empire Atelier installs on phones as an app (PWA) and is set up for the App Store and Google Play with
@@ -84,6 +121,18 @@ http://localhost:1010. Keys go in the `.env` file next to `start.bat`.
 2. On [vercel.com](https://vercel.com), sign in with GitHub, choose **Add New… > Project** and import the repository. Leave the build settings as they are (`vercel.json` sets them).
 3. Under **Environment Variables**, add `YOUCAM_API_KEY` and `ANTHROPIC_API_KEY`, then **Deploy**.
 4. Open the `https://….vercel.app` link. The screens are static files; `/api` runs as one serverless function (`server/vercel.ts`, built by `scripts-build-vercel.mjs`).
+
+### Accounts (sign up and log in)
+
+Shoppers can create an account (**Account** icon in the header). Their favourites, saved looks, bag,
+outfit planner, style profile and stylist chat sync to the account and open on any device, with a
+dashboard at `/account`. Passwords are hashed with scrypt; log-in tokens are signed and last 30 days.
+
+Sign in with Google and with a phone number (SMS code) are built in too. They switch on when the server has `GOOGLE_CLIENT_ID` and the three `TWILIO_*` keys; see `SETUP-SIGNIN.md` for click-by-click steps. Without the keys the buttons explain what is missing.
+
+- **Windows app and `npm start`:** accounts are saved in a `data/` folder next to the app. Nothing to set up. Keep that folder when you update.
+- **Vercel:** functions have no permanent disk, so add a database once: in your Vercel project open **Storage**, choose **Upstash Redis** (free plan), create it and connect it to the project, then **Redeploy**. Vercel adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` itself. Optionally add a long random `AUTH_SECRET` environment variable. Until the database is connected the app still works, and accounts are kept on each visitor's device instead.
+- **Render:** add a Disk mounted at `/opt/render/project/src/data`, or use the same Upstash variables.
 
 ### Hosted preview build
 

@@ -55,6 +55,9 @@ Optional keys (open the ".env" file in Notepad after the first start, paste, sav
 Without keys the app runs in preview mode: try-on is drawn on your photo on the device and the
 built-in stylist answers the chat.
 
+Accounts: people can sign up inside the app. They are saved in the "data" folder next to start.bat,
+so keep that folder when you move or update the app.
+
 Port 1010 busy? Change PORT=1010 in .env to another number, e.g. 1020.
 TXT
 sed -i 's/$/\r/' "$OUT/start.bat" "$OUT/READ-ME-FIRST.txt" "$OUT/.env.example"

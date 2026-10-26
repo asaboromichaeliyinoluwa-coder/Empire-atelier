@@ -15,7 +15,7 @@ export default function SellerPage() {
         <h1 className="h1">{s.name}</h1>
         <p className="lead">{s.about}</p>
         <div className="seller-facts small">
-          <span><b>Rating</b> {s.rating} from {s.reviews.toLocaleString()} reviews</span>
+          {s.reviews > 0 && <span><b>Rating</b> {s.rating} from {s.reviews.toLocaleString()} reviews</span>}
           <span><b>Delivery</b> {s.delivery}</span>
           <span><b>Returns</b> {s.returns}</span>
         </div>

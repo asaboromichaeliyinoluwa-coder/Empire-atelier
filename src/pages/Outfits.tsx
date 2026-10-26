@@ -4,14 +4,12 @@ import { Link } from 'react-router-dom';
 import { IconArrow } from '../components/icons.tsx';
 import { Empty, LookCard, money } from '../components/ui.tsx';
 import { useApp } from '../lib/store.tsx';
-import { COLORS, OCCASIONS, STYLES, type Occasion } from '../shared/catalog.ts';
+import { COLORS, STYLES, type Occasion } from '../shared/catalog.ts';
 import { editorsLooks, suggestOutfits } from '../shared/outfits.ts';
-import { DepartmentSwitch } from '../components/Layout.tsx';
-
-const TOTALS = [200, 300, 400, 600, 0];
+import { BudgetCards, DepartmentCards, OccasionCards } from '../components/Options.tsx';
 
 export default function Outfits() {
-  const { prefs, styled } = useApp();
+  const { prefs, styled, setPrefs } = useApp();
   const [occasion, setOccasion] = useState<Occasion | undefined>(prefs.occasions.length === 1 ? prefs.occasions[0] : undefined);
   const [maxTotal, setMaxTotal] = useState(0);
 
@@ -44,27 +42,18 @@ export default function Outfits() {
         )}
       </div>
 
-      <div className="panel stack gap-16 outfit-filters">
+      <div className="panel stack gap-20 outfit-filters">
         <div className="stack gap-8">
-          <span className="small muted">For</span>
-          <DepartmentSwitch />
+          <span className="opt-label">Dressing</span>
+          <DepartmentCards compact value={prefs.department} onChange={(department) => setPrefs({ department })} />
         </div>
         <div className="stack gap-8">
-          <span className="small muted">Occasion</span>
-          <div className="chips">
-            <button className={`chip ${!occasion ? 'on' : ''}`} onClick={() => setOccasion(undefined)}>{styled && prefs.occasions.length ? 'My occasions' : 'Any'}</button>
-            {OCCASIONS.map((o) => (
-              <button key={o.key} className={`chip ${occasion === o.key ? 'on' : ''}`} onClick={() => setOccasion(o.key)}>{o.label}</button>
-            ))}
-          </div>
+          <span className="opt-label">Occasion</span>
+          <OccasionCards compact department={prefs.department} value={occasion ? [occasion] : []} any={styled && prefs.occasions.length ? 'My occasions' : 'Any'} onToggle={(o) => setOccasion(o && o !== occasion ? o : undefined)} />
         </div>
         <div className="stack gap-8">
-          <span className="small muted">Whole outfit budget</span>
-          <div className="chips">
-            {TOTALS.map((t) => (
-              <button key={t} className={`chip ${maxTotal === t ? 'on' : ''}`} onClick={() => setMaxTotal(t)}>{t ? `Under ${money(t)}` : 'Any total'}</button>
-            ))}
-          </div>
+          <span className="opt-label">Whole outfit budget</span>
+          <BudgetCards compact options={[200, 300, 400, 600, 0]} value={maxTotal} onChange={setMaxTotal} />
         </div>
       </div>
 

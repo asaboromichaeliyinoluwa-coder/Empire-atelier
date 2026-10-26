@@ -5,6 +5,7 @@ import { Layout } from './components/Layout.tsx';
 import { IS_PREVIEW } from './lib/platform.ts';
 import Home from './pages/Home.tsx';
 
+const Admin = lazy(() => import('./pages/Admin.tsx'));
 const Shop = lazy(() => import('./pages/Shop.tsx'));
 const ProductPage = lazy(() => import('./pages/Product.tsx'));
 const TryOn = lazy(() => import('./pages/TryOn.tsx'));
@@ -18,6 +19,8 @@ const Planner = lazy(() => import('./pages/Planner.tsx'));
 const Stylist = lazy(() => import('./pages/Stylist.tsx'));
 const Changer = lazy(() => import('./pages/Changer.tsx'));
 const Report = lazy(() => import('./pages/Report.tsx'));
+const Bag = lazy(() => import('./pages/Bag.tsx'));
+const Account = lazy(() => import('./pages/Account.tsx'));
 
 const wrap = (el: React.ReactNode) => (
   <Suspense fallback={<div className="loading"><div className="spinner" /></div>}>{el}</Suspense>
@@ -42,6 +45,9 @@ const router = (IS_PREVIEW ? createMemoryRouter : createBrowserRouter)([
       { path: '/stylist', element: wrap(<Stylist />) },
       { path: '/changer', element: wrap(<Changer />) },
       { path: '/report', element: wrap(<Report />) },
+      { path: '/bag', element: wrap(<Bag />) },
+      { path: '/admin', element: wrap(<Admin />) },
+      { path: '/account', element: wrap(<Account />) },
       { path: '*', element: <Home /> },
     ],
   },

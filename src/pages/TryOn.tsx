@@ -144,6 +144,11 @@ export default function TryOn() {
             </div>
           ) : (
             <div className="stack gap-12">
+              {wearable.length > 0 && (
+                <span className={`mode-badge ${photoReal ? 'real' : 'mock'}`}>
+                  {photoReal ? 'Real result · rendered by YouCam AI on your photo' : 'On-device preview · an illustrated mockup, not a photo-real result'}
+                </span>
+              )}
               {photoReal ? (
                 <BeforeAfter before={photo} after={photoReal} label="YouCam" />
               ) : (

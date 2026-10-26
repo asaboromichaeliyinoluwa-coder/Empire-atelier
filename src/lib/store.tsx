@@ -27,6 +27,7 @@ export type PlanDay = {
 export type ChangedLook = { id: string; style: string; image: string; createdAt: number };
 
 export const BACKGROUNDS = [
+  { id: 'clean', label: 'Clean white' },
   { id: 'stars', label: 'Star pattern' },
   { id: 'linen', label: 'Brown to cream' },
   { id: 'plain', label: 'Plain cream' },
@@ -46,6 +47,10 @@ type State = {
   plan: Record<string, PlanDay>;
   chat: ChatTurn[];
   changes: ChangedLook[];
+  /** Pieces in the shopping bag, bought from each seller's own shop. */
+  bag: string[];
+  /** Storefront design the saved state was made under; older states move to the clean background once. */
+  design?: number;
 };
 
 type Store = State & {
@@ -60,6 +65,7 @@ type Store = State & {
   planDay: (date: string, day: PlanDay | undefined) => void;
   addChange: (c: Omit<ChangedLook, 'id' | 'createdAt'>) => void;
   removeChange: (id: string) => void;
+  toggleBag: (id: string) => void;
   reset: () => void;
 };
 
@@ -70,10 +76,12 @@ const initial: State = {
   styled: false,
   favorites: [],
   looks: [],
-  background: 'stars',
+  background: 'clean',
   plan: {},
   chat: [],
   changes: [],
+  bag: [],
+  design: 2,
 };
 
 const sameItems = (a: string[], b: string[]) => a.length === b.length && [...a].sort().join() === [...b].sort().join();
@@ -86,7 +94,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        return { ...initial, ...saved, prefs: { ...initial.prefs, ...saved.prefs } };
+        const fresh = saved.design === initial.design ? {} : { background: initial.background, design: initial.design };
+        return { ...initial, ...saved, ...fresh, prefs: { ...initial.prefs, ...saved.prefs } };
       }
     } catch {
       // Private mode or blocked storage: start fresh.
@@ -141,6 +150,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       addChange: (c) =>
         setState((s) => ({ ...s, changes: [{ ...c, id: `${Date.now()}`, createdAt: Date.now() }, ...s.changes].slice(0, 8) })),
       removeChange: (id) => setState((s) => ({ ...s, changes: s.changes.filter((c) => c.id !== id) })),
+      toggleBag: (id) => setState((s) => ({ ...s, bag: s.bag.includes(id) ? s.bag.filter((b) => b !== id) : [...s.bag, id] })),
       reset: () => setState(initial),
     }),
     [state],

@@ -10,6 +10,8 @@ import { composeTryOn, photoKey, resolvePhoto, samplePhoto } from '../lib/compos
 import { downscale, fileToDataUrl } from '../lib/images.ts';
 import { saveFile } from '../lib/platform.ts';
 import { useServerStatus } from '../lib/status.ts';
+import { OptionCard } from '../components/Options.tsx';
+import { productArt } from '../lib/art.ts';
 import { useApp } from '../lib/store.tsx';
 import { productById, type Product } from '../shared/catalog.ts';
 
@@ -31,9 +33,9 @@ const PRESETS: { id: string; name: string; mood: string; gender: 'women' | 'men'
 
 type Mode = 'atelier' | 'templates' | 'upload';
 const GARMENT_TYPES = [
-  { key: 'full_body', label: 'Full outfit or dress' },
-  { key: 'upper_body', label: 'Top or jacket' },
-  { key: 'lower_body', label: 'Trousers or skirt' },
+  { key: 'full_body', label: 'Full outfit or dress', art: 'ivory-agbada' },
+  { key: 'upper_body', label: 'Top or jacket', art: 'blush-blazer' },
+  { key: 'lower_body', label: 'Trousers or skirt', art: 'tailored-trouser' },
 ] as const;
 
 export default function Changer() {
@@ -234,8 +236,8 @@ export default function Changer() {
                   {garmentPhoto ? <img src={garmentPhoto} alt="Garment" /> : <><IconUpload size={26} className="rose" /><span>Upload a garment photo</span></>}
                 </button>
                 <input ref={garmentRef} type="file" accept="image/*" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (f) setGarmentPhoto(await fileToDataUrl(f)); }} />
-                <div className="chips">
-                  {GARMENT_TYPES.map((g) => <button key={g.key} className={`chip ${garmentType === g.key ? 'on' : ''}`} onClick={() => setGarmentType(g.key)}>{g.label}</button>)}
+                <div className="ocards cols3">
+                  {GARMENT_TYPES.map((g) => <OptionCard key={g.key} compact multi={false} on={garmentType === g.key} onClick={() => setGarmentType(g.key)} title={g.label} visual={<img className="ocard-one" src={productArt(productById(g.art)!)} alt="" />} />)}
                 </div>
                 <button className="btn primary" onClick={applyGarment} disabled={!live || !photo || !garmentPhoto || !!busy}><IconWand size={16} /> Change my outfit</button>
                 {!live && <span className="small muted">Needs a YouCam API key on the server for a realistic result.</span>}

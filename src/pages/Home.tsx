@@ -1,12 +1,16 @@
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { DepartmentSwitch } from '../components/Layout.tsx';
-import { IconArrow, IconBag, IconCalendar, IconChat, IconExternal, IconFile, IconHanger, IconHeart, IconSparkle, IconUser, IconWand } from '../components/icons.tsx';
-import { LookCard, ProductCard, money } from '../components/ui.tsx';
+import {
+  IconArrow, IconBag, IconCalendar, IconChat, IconChevron, IconExternal, IconFile, IconHanger, IconHeart, IconSparkle, IconStore,
+  IconCheck, IconTag, IconUser, IconWand, Star,
+} from '../components/icons.tsx';
+import { Collage, GarmentImage, money, ProductCard } from '../components/ui.tsx';
+import { useAuth } from '../lib/auth.tsx';
 import { useApp } from '../lib/store.tsx';
-import { inDepartment, PRODUCTS, SELLERS } from '../shared/catalog.ts';
+import { HOUSES } from '../shared/luxury.ts';
+import { CATEGORIES, inDepartment, MAISON_NOTE, NEW_IN, PRODUCTS, productById, showcase, SELLERS, type Category, type Department } from '../shared/catalog.ts';
 import { editorsLooks, suggestOutfits } from '../shared/outfits.ts';
 
 /** Each feature, and the shopping problem it solves. */
@@ -25,143 +29,349 @@ const FEATURES = [
 ];
 
 const BUDGETS = [50, 100, 150, 250];
+/** The piece pictured on each feature card. */
+const FEATURE_ART = ['blush-blazer', 'camel-trench', 'peony-midi', 'ivory-agbada', 'white-tee', 'monogram-tote', 'blush-heel', 'espresso-briefcase', 'navy-suit-jacket', 'baroque-slip', 'heritage-knit'];
+const MAISON_PICKS = ['vermeil-top-handle', 'malle-trunk-navy', 'aurelia-chrono', 'brut-biker', 'prisma-trench', 'giardino-loafer', 'monogram-trench', 'saddle-bag', 'chunky-runner', 'oversized-hoodie', 'horsebit-loafer', 'saddle-slide', 'silk-carre', 'tweed-jacket', 'leather-trench-m', 'denim-oversize', 'suede-slide-m', 'quilted-clutch', 'baroque-slip', 'monogram-bomber'];
+
+/** The piece that pictures each category, per department. */
+const CATEGORY_ART: Record<Category, Record<Exclude<Department, 'all'>, string>> = {
+  dresses: { women: 'peony-midi', men: 'peony-midi' },
+  sets: { women: 'ivory-agbada', men: 'ivory-agbada' },
+  tops: { women: 'white-blouse', men: 'oxford-white' },
+  bottoms: { women: 'tailored-trouser', men: 'stone-chino' },
+  outerwear: { women: 'camel-trench', men: 'camel-overcoat' },
+  shoes: { women: 'nude-pump', men: 'espresso-loafer' },
+  bags: { women: 'vermeil-top-handle', men: 'malle-weekender-navy' },
+  accessories: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+};
+
+/** A row that scrolls sideways, with arrow buttons on wide screens. */
+function useScroller() {
+  const ref = useRef<HTMLDivElement>(null);
+  const by = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: 'smooth' });
+  const arrows = (
+    <span className="arrows">
+      <button className="round-btn" onClick={() => by(-1)} aria-label="Scroll back"><IconChevron left size={16} /></button>
+      <button className="round-btn" onClick={() => by(1)} aria-label="Scroll on"><IconChevron size={16} /></button>
+    </span>
+  );
+  return { ref, arrows };
+}
+
+function SectionHead({ title, sub, to, label = 'View all', arrows }: { title: string; sub?: string; to?: string; label?: string; arrows?: React.ReactNode }) {
+  return (
+    <div className="shop-head">
+      <div>
+        <h2 className="shop-title">{title}</h2>
+        {sub && <p className="small muted">{sub}</p>}
+      </div>
+      <div className="row gap-12">
+        {to && <Link to={to} className="link small">{label}</Link>}
+        {arrows}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const { name, prefs, styled, setPrefs } = useApp();
+  const navigate = useNavigate();
   const d = prefs.department;
+  const artDept = d === 'men' ? 'men' : 'women';
+  const { user } = useAuth();
+  const arrivals = useScroller();
+  const maison = useScroller();
+  const collections = useScroller();
+
+  const realItems = PRODUCTS.filter((p) => p.custom && inDepartment(p, d)).slice(0, 8);
+  const fresh = NEW_IN.map((id) => PRODUCTS.find((p) => p.id === id)).filter((p) => p && inDepartment(p, d)) as NonNullable<ReturnType<typeof productById>>[];
+  const maisonItems = MAISON_PICKS.map((id) => PRODUCTS.find((p) => p.id === id)).filter((p) => p && inDepartment(p, d)) as NonNullable<ReturnType<typeof productById>>[];
   const looks = useMemo(() => {
-    if (styled) return suggestOutfits(prefs, { limit: 3 });
     const ed = editorsLooks(d);
+    const picked = styled ? [...suggestOutfits(prefs, { limit: 2 }), ...ed] : ed;
+    if (d !== 'all' || styled) return picked.slice(0, 8);
     // Both departments: alternate women's and men's editors' looks.
-    return d === 'all' ? [ed[0], ed.find((o) => o.gender === 'men')!, ed[1]] : ed.slice(0, 3);
+    const w = ed.filter((o) => o.gender === 'women'), m = ed.filter((o) => o.gender === 'men');
+    return w.flatMap((o, i) => (m[i] ? [o, m[i]] : [o])).slice(0, 8);
   }, [prefs, styled, d]);
-  const fresh = PRODUCTS.filter((p) => ['peony-midi', 'ivory-agbada', 'blush-blazer', 'navy-suit-jacket', 'gilded-mini', 'camel-overcoat', 'blush-heel', 'espresso-loafer', 'striped-shirt', 'wine-senator', 'blush-tote', 'espresso-briefcase'].includes(p.id) && inDepartment(p, d));
+  const categories = CATEGORIES.filter((c) => PRODUCTS.some((p) => p.category === c.key && inDepartment(p, d)));
+  const otherDept = d === 'men' ? ('women' as const) : ('men' as const);
 
   return (
-    <div className="container stack gap-48">
-      <section className="hero panel">
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="hero-copy">
-          <span className="eyebrow">{name ? `Welcome back, ${name}` : 'Menswear & womenswear · Virtual fitting room'}</span>
-          <h1 className="display">
-            Dress for the life <em>you’re building.</em>
-          </h1>
-          <p className="lead">
-            Try clothes on your own photo, change your outfit in a tap, plan the week ahead with your AI stylist, and buy
-            straight from the boutiques that make them.
-          </p>
-          <div className="row gap-12 wrap">
-            <Link to="/try-on" className="btn primary"><IconSparkle size={16} /> Start a try-on</Link>
-            <Link to={styled ? '/outfits' : '/style'} className="btn ghost">
-              {styled ? 'See my outfits' : 'Find my style'} <IconArrow size={16} />
-            </Link>
-          </div>
-          <div className="dept-cards">
-            <Link to="/shop" onClick={() => setPrefs({ department: 'women' })} className="dept-card">
-              <span className="eyebrow">Shop</span><b>Women</b>
-            </Link>
-            <Link to="/shop" onClick={() => setPrefs({ department: 'men' })} className="dept-card dark">
-              <span className="eyebrow">Shop</span><b>Men</b>
-            </Link>
-          </div>
-        </motion.div>
-        <motion.div className="hero-art" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.1 }}>
-          <div className="arch">
+    <div className="home stack">
+      {/* ---------- Hero ---------- */}
+      <section className="hero-wide">
+        <div className="container hero-inner">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="hero-copy">
+            <span className="eyebrow">{user || name ? `Welcome back, ${(user?.name || name).split(' ')[0]}` : 'Menswear & womenswear · Virtual fitting room'}</span>
+            <h1 className="hero-title">
+              Dress for the life <strong>you’re building</strong>
+            </h1>
+            <p className="hero-lead">
+              Timeless pieces from independent boutiques. Try them on your own photo, let your AI stylist
+              put the look together, and buy straight from the people who make them.
+            </p>
+            <div className="row gap-12 wrap">
+              <Link to="/shop?new=1" className="btn primary pill">Shop new in</Link>
+              <Link to="/try-on" className="btn outline pill"><IconSparkle size={15} /> Start a try-on</Link>
+            </div>
+          </motion.div>
+          <motion.div className="hero-scene" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.1 }}>
+            <LeafShadow />
+            <div className="scene-arch" />
             <HeroFigure />
-          </div>
-          <div className="hero-chip"><IconSparkle size={14} className="gold" /> Powered by YouCam AI try-on</div>
-        </motion.div>
-      </section>
-
-      <section className="stack gap-20">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">Made for the way you shop</span>
-            <h2 className="h2">Everything in one atelier</h2>
-          </div>
-        </div>
-        <div className="features">
-          {FEATURES.map(({ to, Icon, title, text, solves }, i) => (
-            <motion.div key={title} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
-              <Link to={to} className="feature panel">
-                <span className="feature-icon"><Icon size={20} /></span>
-                <b>{title}</b>
-                <span className="small">{text}</span>
-                <span className="solves">Solves: {solves}</span>
-              </Link>
-            </motion.div>
-          ))}
+            <div className="plaque">
+              <Star size={34} />
+              <b>Empire Atelier</b>
+              <small>Dress for the life you’re building</small>
+            </div>
+            <div className="hero-chip"><IconSparkle size={14} /> Powered by YouCam AI try-on</div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="stack gap-20">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{styled ? 'Picked for your style' : 'From our editors'}</span>
-            <h2 className="h2">Outfits to try</h2>
-          </div>
-          <Link to="/outfits" className="link">All outfits <IconArrow size={14} /></Link>
+      <div className="container">
+        <div className="trust panel">
+          <Link to="/try-on"><IconSparkle size={22} /><span><b>Virtual try-on</b><small>On every wearable piece</small></span></Link>
+          <Link to="/sellers"><IconStore size={22} /><span><b>Buy direct</b><small>{SELLERS.length === 1 ? 'Straight from our own studio' : `From ${SELLERS.length} independent boutiques`}</small></span></Link>
+          <Link to="/shop?max=100"><IconTag size={22} /><span><b>Budget filter</b><small>Only see what you can spend</small></span></Link>
+          <Link to="/stylist"><IconChat size={22} /><span><b>AI stylist</b><small>Ask for any occasion, any time</small></span></Link>
         </div>
-        <DepartmentSwitch />
-        <div className="look-grid">
-          {looks.filter(Boolean).map((o, i) => <LookCard key={o.id} outfit={o} index={i} />)}
-        </div>
-        {!styled && (
-          <Link to="/style" className="banner panel">
-            <span><b>Make these yours.</b> Answer four quick questions and every suggestion fits your style, colours and budget.</span>
-            <IconArrow size={18} />
-          </Link>
+      </div>
+
+      <div className="container stack home-sections">
+        {/* ---------- Real products ---------- */}
+        {realItems.length > 0 && (
+          <section className="stack gap-20">
+            <SectionHead title="Our products" to="/shop" />
+            <div className="product-grid">
+              {realItems.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
+            </div>
+          </section>
         )}
-      </section>
 
-      <section className="stack gap-20">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">Shop by budget</span>
-            <h2 className="h2">Beautiful at every price</h2>
-          </div>
-        </div>
-        <div className="budget-tiles">
-          {BUDGETS.map((b) => (
-            <Link key={b} to={`/shop?max=${b}`} className="budget-tile panel">
-              <span className="small muted">Under</span>
-              <span className="display-sm">{money(b)}</span>
-              <span className="small">{PRODUCTS.filter((p) => p.price <= b && inDepartment(p, d)).length} pieces</span>
+        {/* ---------- Shop by category ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="Shop by category" to="/shop" />
+          <div className="circles">
+            {categories.map((c, i) => {
+              const p = PRODUCTS.find((x) => x.category === c.key && inDepartment(x, d)) ?? showcase(CATEGORY_ART[c.key][artDept]);
+              return (
+                <motion.div key={c.key} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}>
+                  <Link to={`/shop?category=${c.key}`} className="circle">
+                    <span className="disc"><GarmentImage product={p} /></span>
+                    <span>{c.label}</span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+            {d !== 'all' && (
+              <Link to="/shop" className="circle" onClick={(e) => { e.preventDefault(); setPrefs({ department: otherDept }); navigate('/shop'); }}>
+                <span className="disc"><GarmentImage product={showcase(otherDept === 'men' ? 'navy-suit-jacket' : 'blush-slip', 1)} /></span>
+                <span>{otherDept === 'men' ? 'Men' : 'Women'}</span>
+              </Link>
+            )}
+            {d === 'all' && (
+              <Link to="/shop" className="circle" onClick={(e) => { e.preventDefault(); setPrefs({ department: 'men' }); navigate('/shop'); }}>
+                <span className="disc"><GarmentImage product={showcase('navy-suit-jacket', 0)} /></span>
+                <span>Men</span>
+              </Link>
+            )}
+            <Link to="/shop?sale=1" className="circle">
+              <span className="disc sale-disc">Sale</span>
+              <span>Sale</span>
             </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="stack gap-20">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">New this week</span>
-            <h2 className="h2">Fresh in the atelier</h2>
           </div>
-          <Link to="/shop" className="link">Shop all <IconArrow size={14} /></Link>
-        </div>
-        <div className="product-scroller">
-          {fresh.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
-        </div>
-      </section>
+        </section>
 
-      <section className="stack gap-20">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">Participating sellers</span>
-            <h2 className="h2">Boutiques you’ll love</h2>
+        {/* ---------- New arrivals ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="New arrivals" sub="Fresh styles. Just in." to="/shop?new=1" arrows={arrivals.arrows} />
+          <div className="product-scroller" ref={arrivals.ref}>
+            {fresh.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
           </div>
-          <Link to="/sellers" className="link">All sellers <IconArrow size={14} /></Link>
-        </div>
-        <div className="seller-strip">
-          {SELLERS.map((s) => (
-            <Link key={s.id} to={`/sellers/${s.id}`} className="seller-pill panel">
-              <b>{s.name}</b>
-              <span className="small muted">{s.city}</span>
+        </section>
+
+        {/* ---------- Promo trio ---------- */}
+        <section className="promos">
+          <Link to="/try-on" className="promo dark">
+            <span className="promo-copy">
+              <span className="promo-kicker">See it on you first</span>
+              <b>Virtual try-on</b>
+              <small>Upload one photo and try any piece, photo-real, not 3D.</small>
+              <span className="promo-btn">Start a try-on</span>
+            </span>
+            <span className="promo-art arch-art"><GarmentImage product={showcase('blush-blazer', 2)} /></span>
+          </Link>
+          <Link to="/changer" className="promo cream">
+            <span className="promo-copy">
+              <span className="promo-kicker">New season</span>
+              <b>New look</b>
+              <small>Swap your whole outfit in one tap with the AI clothes changer.</small>
+              <span className="promo-btn">Change my outfit</span>
+            </span>
+            <span className="promo-art stack-art">
+              <GarmentImage product={showcase('camel-trench', 3)} />
+              <GarmentImage product={showcase('navy-senator', 4)} />
+            </span>
+          </Link>
+          <Link to="/planner" className="promo linen">
+            <span className="promo-copy">
+              <span className="promo-kicker">Smart outfit planner</span>
+              <b>Plan your week</b>
+              <small>A look for every day, matched to what’s on.</small>
+              <span className="promo-btn">Open the planner</span>
+            </span>
+            <span className="promo-art week-art" aria-hidden>
+              {['Mon', 'Wed', 'Fri'].map((day, i) => (
+                <span key={day} className="mini-day">
+                  <small>{day}</small>
+                  <GarmentImage product={showcase(['white-blouse', 'wine-senator', 'gilded-mini'][i], 5 + i)} />
+                </span>
+              ))}
+            </span>
+          </Link>
+        </section>
+
+        {/* ---------- The Maison edit ---------- */}
+        <section className="maison">
+          <div className="maison-intro">
+            <span className="eyebrow light">The Maison edit</span>
+            <h2 className="maison-title">Luxury, <em>reimagined</em></h2>
+            <p>Monogram canvas, saddle leather, oversized streetwear, silk carrés and heritage stripes. Original designs drawn in the spirit of the great fashion houses, in real leather, suede, silk, wool and denim finishes.</p>
+            <Link to="/shop?luxury=1" className="btn pill light-btn">Shop the luxury houses</Link>
+            <small className="maison-fine">{MAISON_NOTE}</small>
+          </div>
+          <div className="maison-shelf">
+            <div className="row between"><span className="small light-muted">{maisonItems.length} pieces</span>{maison.arrows}</div>
+            <div className="product-scroller dark-cards" ref={maison.ref}>
+              {maisonItems.map((p, i) => <ProductCard key={p!.id} product={p!} index={i} />)}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- The houses ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="The luxury houses" sub="Six original labels, each with its own materials and mood." to="/shop?luxury=1" />
+          <div className="house-grid">
+            {HOUSES.map((h) => {
+              const picks = PRODUCTS.filter((p) => p.sellerId === h.id && inDepartment(p, d)).slice(0, 3);
+              return (
+                <Link key={h.id} to={`/shop?seller=${h.id}`} className="house-card">
+                  <span className="house-art">{picks.map((p) => <GarmentImage key={p.id} product={p} />)}</span>
+                  <span className="house-swatches">{h.palette.map((c) => <i key={c} style={{ background: c }} />)}</span>
+                  <b>{h.name}</b>
+                  <small>{h.vibe} · {h.city}</small>
+                </Link>
+              );
+            })}
+          </div>
+          <small className="muted">{MAISON_NOTE}</small>
+        </section>
+
+        {/* ---------- Explore collections ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="Explore collections" sub={styled ? 'Picked for your style, plus our editors’ favourites.' : 'Hand-picked looks for every occasion.'} to="/outfits" arrows={collections.arrows} />
+          <div className="collection-row" ref={collections.ref}>
+            {looks.map((o) => (
+              <Link key={o.id} to={`/look?items=${o.itemIds.join(',')}&name=${encodeURIComponent(o.name)}&occasion=${o.occasion}`} className="collection">
+                <Collage itemIds={o.itemIds} />
+                <span className="collection-copy">
+                  <b>{o.name}</b>
+                  <small>{o.reasons.slice(0, 2).join(' · ')} · {money(o.total)}</small>
+                  <span className="promo-btn light">Shop the look</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+          {!styled && (
+            <Link to="/style" className="banner panel">
+              <span><b>Make these yours.</b> Answer four quick questions and every suggestion fits your style, colours and budget.</span>
+              <IconArrow size={18} />
             </Link>
-          ))}
-        </div>
-      </section>
+          )}
+        </section>
+
+        {/* ---------- Budget ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="Shop by budget" sub="Beautiful at every price." />
+          <div className="budget-tiles">
+            {BUDGETS.map((b) => (
+              <Link key={b} to={`/shop?max=${b}`} className="budget-tile">
+                <span className="small muted">Under</span>
+                <span className="display-sm">{money(b)}</span>
+                <span className="small">{PRODUCTS.filter((p) => p.price <= b && inDepartment(p, d)).length} pieces <IconArrow size={13} /></span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------- Every feature ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="Everything in one atelier" sub="Made for the way you shop." />
+          <div className="fcards">
+            {FEATURES.map(({ to, Icon, title, text, solves }, i) => (
+              <motion.div key={title} initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ delay: (i % 4) * 0.06, duration: 0.5 }}>
+                <Link to={to} className={`fcard theme-${i % 6}`}>
+                  <span className="fcard-visual">
+                    <span className="fcard-num">{String(i + 1).padStart(2, '0')}</span>
+                    <GarmentImage product={showcase(FEATURE_ART[i], 8 + i)} />
+                    <span className="fcard-icon"><Icon size={20} /></span>
+                  </span>
+                  <span className="fcard-body">
+                    <b>{title}</b>
+                    <span className="small">{text}</span>
+                    <span className="solves-pill"><IconCheck size={12} /> Solves: {solves}</span>
+                    <span className="fcard-go">Open <IconArrow size={13} /></span>
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------- Membership ---------- */}
+        {!user && (
+          <section className="join">
+            <span className="join-star"><Star size={40} /></span>
+            <div className="grow stack gap-8">
+              <h2 className="h2">Join the atelier. It’s free.</h2>
+              <p className="small">Create an account and your favourites, saved looks, bag and outfit planner follow you to every device, with a dashboard that keeps it all in one place.</p>
+            </div>
+            <Link to="/account" className="btn primary pill">Create my account</Link>
+          </section>
+        )}
+
+        {/* ---------- Sellers ---------- */}
+        <section className="stack gap-20">
+          <SectionHead title="Boutiques you’ll love" sub="Participating sellers. Buy direct, tagged so they know you came from us." to="/sellers" label="All sellers" />
+          <div className="seller-strip">
+            {SELLERS.map((s) => (
+              <Link key={s.id} to={`/sellers/${s.id}`} className="seller-pill">
+                <b>{s.name}</b>
+                <span className="small muted">{s.city}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
+  );
+}
+
+/** Soft palm-leaf shadow falling across the hero, as in a sunlit studio. */
+function LeafShadow() {
+  return (
+    <svg className="leaf-shadow" viewBox="0 0 200 260" aria-hidden>
+      <g fill="currentColor">
+        <path d="M190 10 C120 60 80 130 40 250 L46 252 C88 136 126 70 194 16Z" />
+        {Array.from({ length: 11 }, (_, i) => {
+          const t = i / 10;
+          const x = 186 - t * 140, y = 20 + t * 225;
+          return <path key={i} d={`M${x} ${y} q-${50 - t * 18} ${6 + t * 10} -${74 - t * 30} ${-20 + t * 30} q${30} ${18} ${74 - t * 30} ${24 - t * 14}Z`} />;
+        })}
+      </g>
+    </svg>
   );
 }
 

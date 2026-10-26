@@ -2,22 +2,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { usePhoto } from '../lib/photos.ts';
 import { productArt } from '../lib/art.ts';
 import { fileToDataUrl } from '../lib/images.ts';
 import { IS_PREVIEW } from '../lib/platform.ts';
 import { useApp } from '../lib/store.tsx';
 import {
-  isDemoLink, OCCASIONS, productById, retailerUrl, sellerById, type Product,
+  colourways, isDemoLink, OCCASIONS, productById, retailerUrl, sellerById, type Product,
 } from '../shared/catalog.ts';
 import type { Outfit } from '../shared/outfits.ts';
-import { IconCamera, IconCheck, IconClose, IconExternal, IconHeart, IconSparkle, IconStar, IconUpload } from './icons.tsx';
+import { IconBag, IconCamera, IconCheck, IconClose, IconExternal, IconHeart, IconSparkle, IconStar, IconUpload } from './icons.tsx';
 
 export const money = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 export function GarmentImage({ product, className = '' }: { product: Product; className?: string }) {
+  const photo = usePhoto(product.id, className.includes('large') ? 'front' : 'thumb');
   return (
-    <div className={`garment ${className}`}>
-      <img src={product.image ?? productArt(product)} alt={product.name} loading="lazy" draggable={false} />
+    <div className={`garment ${className} ${product.image || photo ? 'photo' : ''}`}>
+      <img src={product.image ?? photo ?? productArt(product)} alt={product.name} loading="lazy" draggable={false} />
     </div>
   );
 }
@@ -52,7 +54,9 @@ export function HeartButton({ id, className = '' }: { id: string; className?: st
 }
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const seller = sellerById(product.sellerId)!;
+  const ways = colourways(product).slice(0, 4);
+  const [shown, setShown] = useState(product);
+  const seller = sellerById(shown.sellerId)!;
   return (
     <motion.div
       className="pcard"
@@ -60,20 +64,46 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index, 12) * 0.03, duration: 0.4 }}
     >
-      <Link to={`/product/${product.id}`} className="pcard-link">
+      <Link to={`/product/${shown.id}`} className="pcard-link">
         <div className="pcard-media">
-          <GarmentImage product={product} />
-          {product.was && <span className="tag sale">Sale</span>}
-          {product.garment && <span className="tag tryon"><IconSparkle size={12} /> Try on</span>}
+          <GarmentImage product={shown} />
+          {shown.was && <span className="tag sale">−{Math.round((1 - shown.price / shown.was) * 100)}%</span>}
+          {shown.garment && <span className="tag tryon"><IconSparkle size={12} /> Try on</span>}
         </div>
         <div className="pcard-body">
           <div className="seller-name">{seller.name}</div>
-          <div className="pname">{product.name}</div>
-          <Price product={product} />
+          <div className="pname">{shown.name}</div>
+          <Price product={shown} />
         </div>
       </Link>
-      <HeartButton id={product.id} className="pcard-heart" />
+      {ways.length > 1 && (
+        <div className="pcard-swatches" role="group" aria-label="Colours">
+          {ways.map((w) => (
+            <button
+              key={w.id}
+              className={w.id === shown.id ? 'on' : ''}
+              style={{ background: w.color.hex }}
+              onClick={() => setShown(w)}
+              title={w.color.name}
+              aria-label={w.color.name}
+              aria-pressed={w.id === shown.id}
+            />
+          ))}
+        </div>
+      )}
+      <HeartButton id={shown.id} className="pcard-heart" />
     </motion.div>
+  );
+}
+
+/** Adds a piece to the shopping bag, or takes it out. */
+export function BagButton({ product, className = 'btn ghost' }: { product: Product; className?: string }) {
+  const { bag, toggleBag } = useApp();
+  const inBag = bag.includes(product.id);
+  return (
+    <button className={`${className} ${inBag ? 'on' : ''}`} onClick={() => toggleBag(product.id)} aria-pressed={inBag}>
+      {inBag ? <><IconCheck size={15} /> In your bag</> : <><IconBag size={15} /> Add to bag</>}
+    </button>
   );
 }
 
@@ -112,6 +142,8 @@ export function OutboundLink({ url, sellerName, className = 'btn primary', child
 
 export function RetailerButton({ product, className, short }: { product: Product; className?: string; short?: boolean }) {
   const seller = sellerById(product.sellerId)!;
+  // A shop owner's product with no link: buyers are told how to reach the seller instead.
+  if (product.custom && !product.url && seller.website.includes('my-store.example.com')) return <span className="small muted">{seller.delivery}</span>;
   return (
     <OutboundLink url={retailerUrl(product)} sellerName={seller.name} className={className}>
       {short ? 'Buy' : `Buy at ${seller.name}`}
@@ -127,7 +159,7 @@ export function SellerBadge({ sellerId }: { sellerId: string }) {
       <span>
         <b>{s.name}</b>
         <span className="muted small">
-          {s.city} · <IconStar size={11} className="gold" /> {s.rating} ({s.reviews.toLocaleString()})
+          {s.city}{s.reviews > 0 && <> · <IconStar size={11} className="gold" /> {s.rating} ({s.reviews.toLocaleString()})</>}
         </span>
       </span>
     </Link>

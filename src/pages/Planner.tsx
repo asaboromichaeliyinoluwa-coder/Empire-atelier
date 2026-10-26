@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { BudgetCards } from '../components/Options.tsx';
 import { DepartmentSwitch } from '../components/Layout.tsx';
 import { IconArrow, IconBack, IconCalendar, IconClose, IconSparkle } from '../components/icons.tsx';
 import { Collage, money } from '../components/ui.tsx';
@@ -59,7 +60,7 @@ export default function Planner() {
     app.planDay(key, { ...app.plan[key], occasion, itemIds: look?.itemIds, lookName: look?.name });
   };
 
-  const useSaved = (d: Date, id: string) => {
+  const wearSaved = (d: Date, id: string) => {
     const look = app.looks.find((l) => l.id === id);
     if (look) app.planDay(dateKey(d), { ...app.plan[dateKey(d)], itemIds: look.itemIds, lookName: look.name });
   };
@@ -92,11 +93,7 @@ export default function Planner() {
         </div>
         <div className="stack gap-8">
           <span className="small muted">Per outfit</span>
-          <div className="chips">
-            {OUTFIT_CAPS.map((c) => (
-              <button key={c} className={`chip ${cap === c ? 'on' : ''}`} onClick={() => setCap(c)}>{c ? `Under ${money(c)}` : 'Any'}</button>
-            ))}
-          </div>
+          <BudgetCards compact options={OUTFIT_CAPS} value={cap} onChange={setCap} />
         </div>
         <div className="row gap-8 wrap planner-actions">
           <button className="btn primary" onClick={() => fill(false)} disabled={!emptyDays}>
@@ -154,7 +151,7 @@ export default function Planner() {
                 </div>
               )}
               {app.looks.length > 0 && (
-                <select className="day-saved" value="" onChange={(e) => useSaved(d, e.target.value)} aria-label="Wear a saved look">
+                <select className="day-saved" value="" onChange={(e) => wearSaved(d, e.target.value)} aria-label="Wear a saved look">
                   <option value="">Wear a saved look…</option>
                   {app.looks.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                 </select>

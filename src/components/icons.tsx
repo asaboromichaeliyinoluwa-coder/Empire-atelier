@@ -36,6 +36,14 @@ export const IconChat = (p: P) => <svg {...base(p)}><path d="M5 18.5V6a2 2 0 0 1
 export const IconWand = (p: P) => <svg {...base(p)}><path d="m4 20 11-11M13 7l4 4" /><path d="M18 3v3M16.5 4.5h3M20 9v2M19 10h2M8 3v2M7 4h2" /></svg>;
 export const IconFile = (p: P) => <svg {...base(p)}><path d="M7 3h7l5 5v13H7Z" /><path d="M14 3v5h5M10 13h6M10 17h6" /></svg>;
 export const IconSend = (p: P) => <svg {...base(p)}><path d="M4 12 20 4l-6 16-3-7Z" /><path d="m11 13 9-9" /></svg>;
+export const IconSearch = (p: P) => <svg {...base(p)}><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>;
+export const IconChevron = ({ left, ...p }: P & { left?: boolean }) => <svg {...base(p)}>{left ? <path d="m15 6-6 6 6 6" /> : <path d="m9 6 6 6-6 6" />}</svg>;
+export const IconMinus = (p: P) => <svg {...base(p)}><path d="M6 12h12" /></svg>;
+export const IconTag = (p: P) => <svg {...base(p)}><path d="M3 12V4h8l10 10-8 8Z" /><circle cx="7.5" cy="8.5" r="1.4" /></svg>;
+export const IconShield = (p: P) => <svg {...base(p)}><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6Z" /><path d="m9 12 2 2 4-4" /></svg>;
+export const IconLeaf = (p: P) => <svg {...base(p)}><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15" /><path d="M5 19 13 11" /></svg>;
+export const IconMail = (p: P) => <svg {...base(p)}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>;
+export const IconPhone = (p: P) => <svg {...base(p)}><rect x="7" y="2.5" width="10" height="19" rx="2" /><path d="M11 18.5h2" /></svg>;
 export const IconDownload = (p: P) => <svg {...base(p)}><path d="M12 4v12M7 11l5 5 5-5M4 20h16" /></svg>;
 
 /** Empire Atelier monogram: a five-pointed star drawn as one interlaced ribbon. */

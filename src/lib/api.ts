@@ -12,7 +12,7 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-export async function getStatus(): Promise<{ youcam: boolean; stylist: boolean }> {
+export async function getStatus(): Promise<{ youcam: boolean; stylist: boolean; accounts?: 'redis' | 'file' | 'none'; googleClientId?: string | null; phone?: boolean }> {
   if (IS_PREVIEW) return { youcam: false, stylist: false };
   return json('/api/status');
 }

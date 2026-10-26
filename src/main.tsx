@@ -3,13 +3,19 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App.tsx';
 import { IS_NATIVE, IS_PREVIEW } from './lib/platform.ts';
+import { AuthProvider } from './lib/auth.tsx';
+import { ShopProvider } from './lib/shop.tsx';
 import { AppStoreProvider } from './lib/store.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppStoreProvider>
-      <App />
+      <AuthProvider>
+        <ShopProvider>
+          <App />
+        </ShopProvider>
+      </AuthProvider>
     </AppStoreProvider>
   </StrictMode>,
 );

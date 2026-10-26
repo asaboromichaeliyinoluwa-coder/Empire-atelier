@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { IconCheck } from '../components/icons.tsx';
 import { PriceRange } from '../components/ui.tsx';
 import { BACKGROUNDS, useApp } from '../lib/store.tsx';
-import { COLORS, DEPARTMENTS, OCCASIONS, PRICE_MAX, STYLES } from '../shared/catalog.ts';
+import { BudgetCards, ColourCards, DepartmentCards, OccasionCards } from '../components/Options.tsx';
+import { inDepartment, PRICE_MAX, PRODUCTS, STYLES } from '../shared/catalog.ts';
 import { garmentSvg, svgDataUri, type GarmentKind } from '../shared/garments.ts';
 
 const MEN_ART: Record<string, [GarmentKind, string]> = {
@@ -57,11 +58,7 @@ export default function Style() {
           <h2 className="h3">Who are you shopping for?</h2>
           <p className="small muted">Womenswear, menswear, or both. You can switch any time from the top of the page.</p>
         </div>
-        <div className="tabs big">
-          {DEPARTMENTS.map((d) => (
-            <button key={d.key} className={prefs.department === d.key ? 'on' : ''} onClick={() => setPrefs({ ...prefs, department: d.key })}>{d.key === 'all' ? 'Both' : d.label}</button>
-          ))}
-        </div>
+        <DepartmentCards value={prefs.department} onChange={(department) => setPrefs({ ...prefs, department })} />
       </section>
 
       <section className="panel stack gap-16">
@@ -87,26 +84,12 @@ export default function Style() {
 
       <section className="panel stack gap-16">
         <h2 className="h3">Favourite colours</h2>
-        <div className="swatches big">
-          {COLORS.map((c) => {
-            const on = prefs.colors.includes(c.key);
-            return (
-              <button key={c.key} className={`swatch ${on ? 'on' : ''}`} style={{ ['--sw' as string]: c.swatch }} onClick={() => setPrefs({ ...prefs, colors: toggle(prefs.colors, c.key) })} aria-pressed={on}>
-                <span />
-                <small>{c.label}</small>
-              </button>
-            );
-          })}
-        </div>
+        <ColourCards value={prefs.colors} department={prefs.department} onToggle={(c) => setPrefs({ ...prefs, colors: toggle(prefs.colors, c) })} />
       </section>
 
       <section className="panel stack gap-16">
         <h2 className="h3">Occasions you dress for</h2>
-        <div className="chips">
-          {OCCASIONS.map((o) => (
-            <button key={o.key} className={`chip ${prefs.occasions.includes(o.key) ? 'on' : ''}`} onClick={() => setPrefs({ ...prefs, occasions: toggle(prefs.occasions, o.key) })}>{o.label}</button>
-          ))}
-        </div>
+        <OccasionCards value={prefs.occasions} department={prefs.department} onToggle={(o) => o && setPrefs({ ...prefs, occasions: toggle(prefs.occasions, o) })} />
       </section>
 
       <section className="panel stack gap-16">
@@ -114,6 +97,12 @@ export default function Style() {
           <h2 className="h3">Budget per piece</h2>
           <p className="small muted">The shop and your outfit suggestions stay inside this range.</p>
         </div>
+        <BudgetCards
+          options={[50, 100, 250, 500, 0]}
+          value={prefs.budget[0] === 0 && [50, 100, 250, 500].includes(prefs.budget[1]) ? prefs.budget[1] : prefs.budget[1] >= PRICE_MAX && prefs.budget[0] === 0 ? 0 : -1}
+          onChange={(n) => setPrefs({ ...prefs, budget: [0, n || PRICE_MAX] })}
+          count={(n) => PRODUCTS.filter((p) => p.price <= n && inDepartment(p, prefs.department)).length}
+        />
         <PriceRange value={prefs.budget} max={PRICE_MAX} onChange={(budget) => setPrefs({ ...prefs, budget })} />
       </section>
 
