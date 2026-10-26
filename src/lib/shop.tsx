@@ -70,7 +70,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     const base = import.meta.env.BASE_URL;
     const WEARABLE = ['tops', 'bottoms', 'dresses', 'sets'];
     const real = REAL_PRODUCTS.map((p) => ({ ...p, tryOn: p.tryOn ?? WEARABLE.includes(p.category), photos: p.photos.map((u) => base + u) }));
-    registerShop(shopSeller(s.settings), [...real, ...s.products].map(shopProduct));
+    registerShop(shopSeller(s.settings), [...real, ...s.products].map((p) => shopProduct(p, s.settings.contact)));
     setVersion((v) => v + 1);
   }, []);
 
