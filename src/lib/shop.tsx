@@ -68,7 +68,8 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
   const apply = useCallback((s: { settings: ShopSettings; products: ShopProduct[] }, w: Where) => {
     setState(s); setWhere(w);
     const base = import.meta.env.BASE_URL;
-    const real = REAL_PRODUCTS.map((p) => ({ ...p, photos: p.photos.map((u) => base + u) }));
+    const WEARABLE = ['tops', 'bottoms', 'dresses', 'sets'];
+    const real = REAL_PRODUCTS.map((p) => ({ ...p, tryOn: p.tryOn ?? WEARABLE.includes(p.category), photos: p.photos.map((u) => base + u) }));
     registerShop(shopSeller(s.settings), [...real, ...s.products].map(shopProduct));
     setVersion((v) => v + 1);
   }, []);
