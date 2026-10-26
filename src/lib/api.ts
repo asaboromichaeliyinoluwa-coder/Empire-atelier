@@ -43,7 +43,7 @@ export async function runYouCamTryOn(products: Product[], photo: string, onProgr
   let source: ImageInput = { dataUrl: photo };
   for (const [i, p] of pieces.entries()) {
     onProgress?.(pieces.length > 1 ? `Fitting ${p.name} (${i + 1} of ${pieces.length})…` : `Fitting ${p.name}…`);
-    const garmentImage = p.tryOnImage && location.protocol === 'https:' ? { url: new URL(p.tryOnImage, location.origin).href } : { dataUrl: await artForYouCam(p) };
+    const garmentImage = { dataUrl: p.tryOnImage ? await new Promise<string>((ok, no) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext('2d')!.drawImage(im, 0, 0); ok(c.toDataURL('image/jpeg', 0.92)); }; im.onerror = () => no(new Error('The product photo could not be loaded.')); im.src = p.tryOnImage!; }) : await artForYouCam(p) };
     const started: { demo: true } | { taskId: string } = await json('/api/tryon', {
       method: 'POST',
       body: JSON.stringify({ productId: p.id, source, garmentImage, garment: p.garment }),
