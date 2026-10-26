@@ -52,7 +52,7 @@ export function shopProduct(p: ShopProduct, contact = ''): Product {
     garment: p.tryOn ? TRY_ON[p.category] : undefined, price: p.price, was: p.was,
     color: { name: p.colorName, hex: p.colorHex, family: familyOf(p.colorHex) },
     styles: ['classic'], occasions: ['casual'], sellerId: SHOP_SELLER_ID, material: p.material || 'See description', sizes: p.sizes,
-    description: p.description || p.name, image: p.photos[0], images: p.photos, tryOnImage: p.tryOn ? p.photos[0] : undefined, url: p.url || orderLink(contact, p.name) || orderLink(contact, p.name) || orderLink(contact, p.name),,
+    description: p.description || p.name, image: p.photos[0], images: p.photos, tryOnImage: p.tryOn ? p.photos[0] : undefined, url: p.url || orderLink(contact, p.name),
     custom: true, group: p.group,
   };
 }
