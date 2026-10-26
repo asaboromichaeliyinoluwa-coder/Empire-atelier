@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { BeforeAfter } from '../components/BeforeAfter.tsx';
 import { IconCheck, IconDownload, IconTrash, IconUpload, IconWand } from '../components/icons.tsx';
-import { Collage, money, PhotoPicker } from '../components/ui.tsx';
+import { money, PhotoPicker } from '../components/ui.tsx';
 import { changerTemplates, runChanger, runYouCamTryOn, type Template } from '../lib/api.ts';
 import { composeTryOn, photoKey, resolvePhoto, samplePhoto } from '../lib/compose.ts';
 import { downscale, fileToDataUrl } from '../lib/images.ts';
@@ -13,23 +13,7 @@ import { useServerStatus } from '../lib/status.ts';
 import { OptionCard } from '../components/Options.tsx';
 import { productArt } from '../lib/art.ts';
 import { useApp } from '../lib/store.tsx';
-import { productById, type Product } from '../shared/catalog.ts';
-
-/** House looks for the changer: each is a full outfit from the catalogue. */
-const PRESETS: { id: string; name: string; mood: string; gender: 'women' | 'men'; itemIds: string[] }[] = [
-  { id: 'gala', name: 'Velvet Gala', mood: 'Black-tie glamour', gender: 'women', itemIds: ['empress-gown'] },
-  { id: 'boardroom', name: 'Boardroom', mood: 'Sharp and tailored', gender: 'women', itemIds: ['tailored-trouser', 'white-blouse', 'black-blazer'] },
-  { id: 'garden', name: 'Garden Party', mood: 'Soft florals', gender: 'women', itemIds: ['peony-midi'] },
-  { id: 'denim', name: 'Weekend Denim', mood: 'Easy and polished', gender: 'women', itemIds: ['blue-jeans', 'striped-shirt'] },
-  { id: 'golden', name: 'Golden Hour', mood: 'Hand-woven boho', gender: 'women', itemIds: ['kente-maxi'] },
-  { id: 'noir', name: 'Sleek Noir', mood: 'Minimal evening', gender: 'women', itemIds: ['noir-jumpsuit'] },
-  { id: 'owambe', name: 'Owambe Agbada', mood: 'Native glamour', gender: 'men', itemIds: ['ivory-agbada'] },
-  { id: 'suit', name: 'Navy Suit', mood: 'Interview and boardroom', gender: 'men', itemIds: ['navy-suit-trouser', 'oxford-white', 'navy-suit-jacket'] },
-  { id: 'senator', name: 'Senator Night', mood: 'Rich and refined', gender: 'men', itemIds: ['wine-senator'] },
-  { id: 'offduty', name: 'Off Duty', mood: 'Street-smart weekend', gender: 'men', itemIds: ['indigo-jeans', 'white-tee', 'black-bomber'] },
-  { id: 'resort', name: 'Resort Linen', mood: 'Beach and city breaks', gender: 'men', itemIds: ['sand-shorts', 'sand-linen-shirt'] },
-  { id: 'overcoat', name: 'City Overcoat', mood: 'Quiet luxury', gender: 'men', itemIds: ['charcoal-trouser', 'camel-rollneck', 'camel-overcoat'] },
-];
+import { inDepartment, PRODUCTS, productById, type Product } from '../shared/catalog.ts';
 
 type Mode = 'atelier' | 'templates' | 'upload';
 const GARMENT_TYPES = [
@@ -58,7 +42,7 @@ export default function Changer() {
     if (live && mode === 'templates' && !templates) changerTemplates().then(setTemplates).catch(() => setTemplates([]));
   }, [live, mode, templates]);
 
-  const presets = PRESETS.filter((p) => department === 'all' || p.gender === department);
+  const mine = PRODUCTS.filter((p) => p.custom && p.garment && inDepartment(p, department));
 
   const choosePhoto = (p: string) => {
     setPhoto(p);
@@ -83,16 +67,14 @@ export default function Changer() {
     }
   };
 
-  const applyPreset = (p: (typeof PRESETS)[number]) => {
-    const items = p.itemIds.map(productById).filter(Boolean) as Product[];
+  const applyProduct = (p: Product) =>
     run(p.name, async () => {
       if (live) {
-        const url = await runYouCamTryOn(items, photo!, setBusy);
+        const url = await runYouCamTryOn([p], photo!, setBusy);
         if (url) return { image: url, real: true };
       }
-      return { image: (await composeTryOn(photo!, items)).image, real: false };
-    }, p.itemIds);
-  };
+      return { image: (await composeTryOn(photo!, [p])).image, real: false };
+    }, [p.id]);
 
   const applyTemplate = (t: Template) =>
     run(t.name, async () => {
@@ -153,8 +135,13 @@ export default function Changer() {
                 <BeforeAfter before={photo} after={result.image} label={result.real ? 'YouCam AI' : 'Preview'} />
               ) : (
                 <div className="stage">
-                  <img src={photo} alt="Your photo" />
-                  <div className="stage-hint">Choose a new outfit →</div>
+                  < img src={photo} alt="Your photo" />
+                  <button
+                    className="stage-hint"
+                    onClick={() => document.getElementById('changer-options')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  >
+                    Choose a new outfit →
+                  </button>
                 </div>
               )}
               <AnimatePresence>
@@ -178,7 +165,7 @@ export default function Changer() {
                       {saved ? <><IconCheck size={16} /> Kept</> : <>Keep this look</>}
                     </button>
                     <button className="btn ghost" onClick={download}><IconDownload size={16} /> Download</button>
-                    {result.itemIds && <Link className="btn text" to={`/look?items=${result.itemIds.join(',')}&name=${encodeURIComponent(result.label)}`}>Shop this look</Link>}
+                    {result.itemIds && < Link className="btn text" to={`/look?items=${result.itemIds.join(',')}&name=${encodeURIComponent(result.label)}`}>Shop this look</Link>}
                   </>
                 )}
                 <button className="btn text" onClick={() => { setPhoto(undefined); setResult(undefined); }}>Change photo</button>
@@ -187,39 +174,40 @@ export default function Changer() {
           )}
         </section>
 
-        <aside className="tryon-side stack gap-20">
+        <aside id="changer-options" className="tryon-side stack gap-20">
           <div className="panel stack gap-12">
             <div className="tabs">
-              <button className={mode === 'atelier' ? 'on' : ''} onClick={() => setMode('atelier')}>House looks</button>
+              <button className={mode === 'atelier' ? 'on' : ''} onClick={() => setMode('atelier')}>My products</button>
               <button className={mode === 'templates' ? 'on' : ''} onClick={() => setMode('templates')}>YouCam styles</button>
               <button className={mode === 'upload' ? 'on' : ''} onClick={() => setMode('upload')}>Any garment</button>
             </div>
 
             {mode === 'atelier' && (
-              <div className="preset-grid">
-                {presets.map((p) => {
-                  const total = p.itemIds.reduce((s, id) => s + (productById(id)?.price ?? 0), 0);
-                  return (
-                    <button key={p.id} className={`preset ${result?.label === p.name ? 'on' : ''}`} onClick={() => applyPreset(p)} disabled={!photo || !!busy}>
-                      <Collage itemIds={p.itemIds} />
+              mine.length ? (
+                <div className="preset-grid">
+                  {mine.map((p) => (
+                    <button key={p.id} className={`preset ${result?.label === p.name ? 'on' : ''}`} onClick={() => applyProduct(p)} disabled={!photo || !!busy}>
+                      < img src={p.image ?? productArt(p)} alt="" loading="lazy" />
                       <b>{p.name}</b>
-                      <span className="small muted">{p.mood} · {money(total)}</span>
+                      <span className="small muted">{money(p.price)}</span>
                     </button>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="small muted">No wearable products yet. Add tops, bottoms or dresses on the My products page.</p>
+              )
             )}
 
             {mode === 'templates' &&
               (!live ? (
-                <p className="small muted">YouCam's outfit styles appear here once a YouCam API key is added on the server. House looks work right away.</p>
+                <p className="small muted">YouCam's outfit styles appear here once a YouCam API key is added on the server. My products work right away.</p>
               ) : !templates ? (
                 <div className="row gap-8 small"><div className="spinner" /> Loading styles…</div>
               ) : templates.length ? (
                 <div className="preset-grid">
                   {templates.map((t) => (
                     <button key={t.id} className={`preset ${result?.label === t.name ? 'on' : ''}`} onClick={() => applyTemplate(t)} disabled={!photo || !!busy}>
-                      <img src={t.thumb} alt="" loading="lazy" />
+                      < img src={t.thumb} alt="" loading="lazy" />
                       <b>{t.name}</b>
                       {t.category && <span className="small muted">{t.category}</span>}
                     </button>
@@ -233,11 +221,11 @@ export default function Changer() {
               <div className="stack gap-12">
                 <p className="small muted">Saw something you love elsewhere? Upload a clear photo of the garment, on a hanger or flat, and see it on you.</p>
                 <button className="dropzone small-zone" onClick={() => garmentRef.current?.click()}>
-                  {garmentPhoto ? <img src={garmentPhoto} alt="Garment" /> : <><IconUpload size={26} className="rose" /><span>Upload a garment photo</span></>}
+                  {garmentPhoto ? < img src={garmentPhoto} alt="Garment" /> : <><IconUpload size={26} className="rose" /><span>Upload a garment photo</span></>}
                 </button>
-                <input ref={garmentRef} type="file" accept="image/*" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (f) setGarmentPhoto(await fileToDataUrl(f)); }} />
+                < input ref={garmentRef} type="file" accept="image/*" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (f) setGarmentPhoto(await fileToDataUrl(f)); }} />
                 <div className="ocards cols3">
-                  {GARMENT_TYPES.map((g) => <OptionCard key={g.key} compact multi={false} on={garmentType === g.key} onClick={() => setGarmentType(g.key)} title={g.label} visual={<img className="ocard-one" src={productArt(productById(g.art)!)} alt="" />} />)}
+                  {GARMENT_TYPES.map((g) => <OptionCard key={g.key} compact multi={false} on={garmentType === g.key} onClick={() => setGarmentType(g.key)} title={g.label} visual={< img className="ocard-one" src={productArt(productById(g.art)!)} alt="" />} />)}
                 </div>
                 <button className="btn primary" onClick={applyGarment} disabled={!live || !photo || !garmentPhoto || !!busy}><IconWand size={16} /> Change my outfit</button>
                 {!live && <span className="small muted">Needs a YouCam API key on the server for a realistic result.</span>}
@@ -251,7 +239,7 @@ export default function Changer() {
               <div className="kept-grid">
                 {app.changes.map((c) => (
                   <figure key={c.id} className="kept">
-                    <img src={c.image} alt={c.style} />
+                    < img src={c.image} alt={c.style} />
                     <figcaption className="row between small">
                       <span>{c.style}</span>
                       <button className="icon-btn" onClick={() => app.removeChange(c.id)} aria-label={`Remove ${c.style}`}><IconTrash size={14} /></button>
