@@ -35,14 +35,24 @@ export function shopSeller(s: ShopSettings): Seller {
   };
 }
 
-export function shopProduct(p: ShopProduct): Product {
+/** A "Buy" link from the owner's contact: a web address, an email, or a WhatsApp number. */
+export function orderLink(contact: string, name: string): string | undefined {
+  const c = contact.trim();
+  if (/^https?:\/\//i.test(c)) return c;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)) return `mailto:${c}?subject=${encodeURIComponent(`Order: ${name}`)}`;
+  const digits = c.replace(/\D/g, '');
+  if (digits.length >= 8) return `https://wa.me/${digits}?text=${encodeURIComponent(`Hello, I would like to order: ${name}`)}`;
+  return undefined;
+}
+
+export function shopProduct(p: ShopProduct, contact = ''): Product {
   const artFor: Record<string, Product['art']> = { tops: 'tee', bottoms: 'jeans', dresses: 'midi-dress', sets: 'kaftan', outerwear: 'blazer', shoes: 'sneakers', bags: 'tote', accessories: 'watch' };
   return {
     id: `my-${p.id}`, name: p.name, category: p.category, gender: p.gender, art: artFor[p.category] ?? 'tee',
     garment: p.tryOn ? TRY_ON[p.category] : undefined, price: p.price, was: p.was,
     color: { name: p.colorName, hex: p.colorHex, family: familyOf(p.colorHex) },
     styles: ['classic'], occasions: ['casual'], sellerId: SHOP_SELLER_ID, material: p.material || 'See description', sizes: p.sizes,
-    description: p.description || p.name, image: p.photos[0], images: p.photos, tryOnImage: p.tryOn ? p.photos[0] : undefined, url: p.url,
+    description: p.description || p.name, image: p.photos[0], images: p.photos, tryOnImage: p.tryOn ? p.photos[0] : undefined, url: p.url || orderLink(contact, p.name) || orderLink(contact, p.name) || orderLink(contact, p.name),,
     custom: true, group: p.group,
   };
 }
