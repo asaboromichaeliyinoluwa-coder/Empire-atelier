@@ -8,7 +8,7 @@
 import type { GarmentKind, Pattern } from './garments.ts';
 import { HOUSE_NOTE, HOUSE_PRODUCTS, HOUSES } from './luxury.ts';
 
-export type Category = 'tops' | 'bottoms' | 'dresses' | 'sets' | 'outerwear' | 'shoes' | 'bags' | 'accessories';
+export type Category = 'tops' | 'bottoms' | 'dresses' | 'sets' | 'outerwear' | 'shoes' | 'bags' | 'accessories' | 'caps' | 'belts' | 'glasses';
 /** Who a piece is cut for. Unisex pieces show in both departments. */
 export type Gender = 'women' | 'men' | 'unisex';
 /** The department the shopper is browsing. */
@@ -73,7 +73,10 @@ export const CATEGORIES: { key: Category; label: string }[] = [
   { key: 'bottoms', label: 'Bottoms' },
   { key: 'outerwear', label: 'Outerwear' },
   { key: 'shoes', label: 'Shoes' },
-  { key: 'bags', label: 'Bags & travel' },
+    { key: 'bags', label: 'Bags' },
+  { key: 'caps', label: 'Caps' },
+  { key: 'belts', label: 'Belts' },
+  { key: 'glasses', label: 'Glasses' },
   { key: 'accessories', label: 'Watches & jewellery' },
 ];
 
