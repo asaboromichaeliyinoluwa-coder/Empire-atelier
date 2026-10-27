@@ -51,7 +51,41 @@ export async function runYouCamTryOn(products: Product[], photo: string, onProgr
     if ('demo' in started) return null;
     source = { url: await poll(started.taskId, onProgress) };
   }
-  return 'url' in source ? source.url : null;
+    // YouCam redraws the lower part of the photo, feet and shoes included, so the shopper's own are put back.
+  return 'url' in source ? keepOriginalFeet(source.url, photo, !pieces.some((p) => p.garment === 'full_body')) : null;
+}
+
+/** Pastes the bottom strip of the shopper's own photo over the render, with a soft top edge. Falls back to the render. */
+async function keepOriginalFeet(resultUrl: string, photo: string, enabled: boolean): Promise<string> {
+  if (!enabled) return resultUrl;
+  try {
+    const load = (src: string) => new Promise<HTMLImageElement>((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => no(new Error('load')); im.src = src; });
+    const blob = await (await fetch(resultUrl)).blob();
+    const [rendered, original] = await Promise.all([load(URL.createObjectURL(blob)), load(photo)]);
+    const w = rendered.naturalWidth, h = rendered.naturalHeight;
+    const strip = Math.round(h * 0.12), fade = Math.round(strip * 0.4);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(rendered, 0, 0, w, h);
+    const feet = document.createElement('canvas');
+    feet.width = w; feet.height = strip;
+    const fctx = feet.getContext('2d')!;
+    const sy = Math.round(original.naturalHeight * (1 - strip / h));
+    fctx.drawImage(original, 0, sy, original.naturalWidth, original.naturalHeight - sy, 0, 0, w, strip);
+    const mask = fctx.createLinearGradient(0, 0, 0, fade);
+    mask.addColorStop(0, 'rgba(0,0,0,0)');
+    mask.addColorStop(1, 'rgba(0,0,0,1)');
+    fctx.globalCompositeOperation = 'destination-in';
+    fctx.fillStyle = mask;
+    fctx.fillRect(0, 0, w, fade);
+    fctx.fillStyle = '#000';
+    fctx.fillRect(0, fade, w, strip - fade);
+    ctx.drawImage(feet, 0, h - strip);
+    return canvas.toDataURL('image/jpeg', 0.92);
+  } catch {
+    return resultUrl;
+  }
 }
 
 type Sample = (input: string, opts?: { cache?: boolean; modelTier?: 'quick' | 'default' | 'complex' }) => Promise<{ text: string }>;
