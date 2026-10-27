@@ -10,7 +10,7 @@ import { AccountError, currentUser, db } from './accounts.ts';
 
 export type { ShopProduct, ShopSettings };
 
-const CATEGORIES = new Set(['tops', 'bottoms', 'dresses', 'sets', 'outerwear', 'shoes', 'bags', 'accessories']);
+const CATEGORIES = new Set(['tops', 'bottoms', 'dresses', 'sets', 'outerwear', 'shoes', 'bags', 'accessories', 'caps', 'belts', 'glasses']);
 const GENDERS = new Set(['women', 'men', 'unisex']);
 const DEFAULT_SETTINGS: ShopSettings = { name: 'Empire Atelier', city: '', website: '', contact: '' };
 const MAX_PHOTO = 700_000; // characters of base64 per photo
