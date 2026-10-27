@@ -1437,3 +1437,7 @@ html, body { background: var(--paper); }
   --sand-2: #e7dfd4;
   --sale: #8a3b2e;
 }
+.size-guide summary { cursor: pointer; text-decoration: underline; }
+.size-guide table { border-collapse: collapse; margin: 8px 0; width: 100%; max-width: 420px; }
+.size-guide th, .size-guide td { border-bottom: 1px solid currentColor; padding: 4px 8px; text-align: left; opacity: .85; }
+button.stage-hint { border: 0; cursor: pointer; font-family: inherit; }
