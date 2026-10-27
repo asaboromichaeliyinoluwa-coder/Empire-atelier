@@ -8,6 +8,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IconCalendar, IconLeaf, IconSparkle, IconStore, IconUser } from '../components/icons.tsx';
 import { BagButton, Empty, HeartButton, LookCard, Price, ProductCard, RetailerButton, SellerBadge } from '../components/ui.tsx';
 import { useApp } from '../lib/store.tsx';
+import SizeGuide from '../components/SizeGuide.tsx';
 import { colourways, MAISON_NOTE, OCCASIONS, PRODUCTS, productById, sellerById, STYLES, type Product } from '../shared/catalog.ts';
 import { suggestOutfits } from '../shared/outfits.ts';
 
@@ -145,6 +146,7 @@ export default function ProductPage() {
                 <button key={s} className={`chip ${size === s ? 'on' : ''}`} onClick={() => setSize(s)}>{s}</button>
               ))}
             </div>
+            <SizeGuide category={product.category} sizes={product.sizes} />
           </div>
 
           <p className="try-note small">
