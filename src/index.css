@@ -1441,3 +1441,36 @@ html, body { background: var(--paper); }
 .size-guide table { border-collapse: collapse; margin: 8px 0; width: 100%; max-width: 420px; }
 .size-guide th, .size-guide td { border-bottom: 1px solid currentColor; padding: 4px 8px; text-align: left; opacity: .85; }
 button.stage-hint { border: 0; cursor: pointer; font-family: inherit; }
+
+
+/* Black & Gold: black header and footer, gold details, champagne page. */
+:root {
+  --ivory: #ecd9bd;
+  --blush: #f4e6d2;
+  --blush-2: #d9bd96;
+  --gold: #c19a5b;
+  --gold-deep: #8a6532;
+  --gold-soft: #f0dfc4;
+}
+html, body {
+  background-color: #ecd9bd;
+  background-image: var(--stars-light), radial-gradient(1200px 600px at 15% -10%, rgba(255, 244, 222, 0.9), transparent 60%), linear-gradient(180deg, #f1e1c8 0%, #e6d0b0 100%);
+  background-attachment: fixed;
+}
+.promo-bar { background: #d4af6a; color: #14100c; }
+.topbar { background: rgba(10, 8, 6, 0.96); border-bottom: 1px solid rgba(212, 175, 106, 0.35); }
+.topbar .brand, .topbar .brand .mark, .topbar .wordmark, .topbar .wordmark b, .topbar .wordmark span { color: #d4af6a !important; }
+.topbar .shopnav a, .topbar .shopnav a.sale { color: #e6c98a !important; }
+.atelier-bar { background: #14100c !important; border-bottom: 1px solid rgba(212, 175, 106, 0.3); }
+.tools a { color: #e6c98a; }
+.tools a:hover { background: rgba(212, 175, 106, 0.16); }
+.tools a.active { background: #d4af6a; color: #14100c; }
+.topbar .brand em { color: #e6c98a !important; }
+.topnav a, .topbar .icon-btn, .topbar .header-search button { color: #e6c98a !important; }
+.topnav a:hover, .topbar .icon-btn:hover { background: rgba(212, 175, 106, 0.16); }
+.topbar .topnav a.active { background: #d4af6a; color: #14100c !important; }
+.header-search { background: #1a1510; border-color: rgba(212, 175, 106, 0.35); }
+.header-search input { color: #f1e3c8; }
+.profile-btn { background: #1a1510; border-color: rgba(212, 175, 106, 0.4); }
+.footer { background: #0a0806; color: #b3a283; }
+.footer a, .footer-links { color: #d4af6a !important; }
