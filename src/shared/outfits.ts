@@ -177,4 +177,4 @@ export const EDITORS_LOOKS: Outfit[] = ([
 }));
 
 /** Editors' looks in the shopper's department. */
-export const editorsLooks = (d: Department) => EDITORS_LOOKS.filter((o) => d === 'all' || o.gender === d);
+export const editorsLooks = (d: Department) => EDITORS_LOOKS.filter((o) => (d === 'all' || o.gender === d) && o.itemIds.every((id) => PRODUCTS.some((p) => p.id === id)));
