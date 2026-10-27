@@ -43,6 +43,9 @@ const CATEGORY_ART: Record<Category, Record<Exclude<Department, 'all'>, string>>
   shoes: { women: 'nude-pump', men: 'espresso-loafer' },
   bags: { women: 'vermeil-top-handle', men: 'malle-weekender-navy' },
   accessories: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  caps: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  belts: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  glasses: { women: 'vermeil-watch', men: 'aurelia-chrono' },
 };
 
 /** A row that scrolls sideways, with arrow buttons on wide screens. */
