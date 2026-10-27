@@ -154,7 +154,7 @@ export default function TryOn() {
               ) : (
                 <div className="stage">
                   {result ? <img src={result} alt="Try-on preview" /> : <div className="spinner" />}
-                  {!wearable.length && <div className="stage-hint">Pick a piece to try on →</div>}
+                 {!wearable.length && <button className="stage-hint" onClick={() => document.getElementById('tryon-pieces')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>Pick a piece to try on →</button>}#
                 </div>
               )}
               <AnimatePresence>
@@ -234,7 +234,7 @@ export default function TryOn() {
             ))}
           </div>
 
-          <div className="panel stack gap-12">
+                <div id="tryon-pieces" className="panel stack gap-12">
             <h2 className="h3">Add a piece</h2>
             <div className="tabs">
               {tabs.map((t) => (
