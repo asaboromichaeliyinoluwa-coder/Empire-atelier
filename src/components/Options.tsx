@@ -145,7 +145,10 @@ const CAT_ART: Record<Category, { women: string; men: string }> = {
   outerwear: { women: 'camel-trench', men: 'camel-overcoat' },
   shoes: { women: 'nude-pump', men: 'espresso-loafer' },
   bags: { women: 'vermeil-top-handle', men: 'malle-weekender-navy' },
-  accessories: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+    accessories: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  caps: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  belts: { women: 'vermeil-watch', men: 'aurelia-chrono' },
+  glasses: { women: 'vermeil-watch', men: 'aurelia-chrono' },
 };
 
 export function CategoryCards({ value, onToggle, department }: { value: Category[]; onToggle: (c: Category) => void; department: Department }) {
