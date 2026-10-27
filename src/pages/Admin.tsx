@@ -11,9 +11,10 @@ const SIZE_SETS: Record<string, string[]> = {
   clothes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
   shoes: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
   waist: ['28', '30', '32', '34', '36', '38'],
-  one: ['One size'],
+   one: ['One size'],
+  belt: ['S', 'M', 'L', 'XL'],
 };
-const sizeSetFor = (cat: string) => (cat === 'shoes' ? SIZE_SETS.shoes : cat === 'bags' || cat === 'accessories' ? SIZE_SETS.one : SIZE_SETS.clothes);
+const sizeSetFor = (cat: string) => (cat === 'shoes' ? SIZE_SETS.shoes : cat === 'belts' ? SIZE_SETS.belt : cat === 'bags' || cat === 'accessories' || cat === 'caps' || cat === 'glasses' ? SIZE_SETS.one : SIZE_SETS.clothes);
 
 type Draft = {
   id?: string; name: string; category: ShopProduct['category']; gender: ShopProduct['gender']; price: string; was: string; description: string; material: string;
