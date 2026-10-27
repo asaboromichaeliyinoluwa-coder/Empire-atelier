@@ -63,7 +63,7 @@ async function keepOriginalFeet(resultUrl: string, photo: string, enabled: boole
     const blob = await (await fetch(resultUrl)).blob();
     const [rendered, original] = await Promise.all([load(URL.createObjectURL(blob)), load(photo)]);
     const w = rendered.naturalWidth, h = rendered.naturalHeight;
-        const strip = Math.round(h * 0.22), fade = Math.round(strip * 0.3);
+            const strip = Math.round(h * 0.34), fade = Math.round(strip * 0.12);
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext('2d')!;
