@@ -27,7 +27,7 @@ const SHOP_NAV: { label: string; to: string; dept?: Department; sale?: true }[] 
   { label: 'Shoes', to: '/shop?category=shoes' },
     { label: 'Bags', to: '/shop?category=bags' },
   { label: 'Watches & jewellery', to: '/shop?category=accessories' },
-  { label: 'Caps', to: '/shop?category=caps' },
+    { label: 'Caps & beanies', to: '/shop?category=caps' },
   { label: 'Belts', to: '/shop?category=belts' },
   { label: 'Glasses', to: '/shop?category=glasses' },
   { label: 'Luxury houses', to: '/shop?luxury=1' },
