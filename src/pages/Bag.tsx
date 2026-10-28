@@ -24,7 +24,7 @@ export default function Bag() {
       <div className="page-head">
         <span className="eyebrow">Shopping bag</span>
         <h1 className="h1">Your bag</h1>
-        <p className="lead">Every piece is sold by an independent boutique. Buy each one on its seller’s own shop, tagged so they know Empire Atelier sent you.</p>
+        <p className="lead">Every piece is sold by an independent boutique. Buy each one on its seller’s own shop, tagged so they know Empire Glamour sent you.</p>
       </div>
 
       {items.length ? (
