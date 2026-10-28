@@ -37,7 +37,7 @@ export default function Stylist() {
           <div className="msg assistant">
             <span className="avatar"><Star size={18} /></span>
             <div className="bubble">
-              {app.name ? `Hello ${app.name}. ` : 'Hello. '}I'm your Empire Atelier stylist. Where are you going, and what would you like to spend? I'll put the whole outfit together.
+              {app.name ? `Hello ${app.name}. ` : 'Hello. '}I'm your Empire Glamour stylist. Where are you going, and what would you like to spend? I'll put the whole outfit together.
             </div>
           </div>
           <AnimatePresence initial={false}>
