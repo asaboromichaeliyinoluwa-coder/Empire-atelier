@@ -36,7 +36,7 @@ export default function Report() {
       if (name.trim() !== app.name) app.update({ name: name.trim() });
       const { buildReport } = await import('../lib/report.ts');
       const blob = await buildReport({ name, prefs: app.prefs, favorites: app.favorites, looks: app.looks, plan, changes: app.changes });
-      await saveFile(`Empire-Atelier-Style-Report${name.trim() ? `-${name.trim().replace(/\W+/g, '-')}` : ''}.pdf`, blob);
+      await saveFile(`Empire-Glamour-Style-Report${name.trim() ? `-${name.trim().replace(/\W+/g, '-')}` : ''}.pdf`, blob);
       setDone(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'The report could not be created.');
@@ -55,7 +55,7 @@ export default function Report() {
 
       <section className="report-cover">
         <Star size={54} />
-        <span className="report-word">Empire Atelier</span>
+        <span className="report-word">Empire Glamour</span>
         <span className="report-title">Personal Style Report</span>
         <input className="input report-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name on the report" maxLength={40} aria-label="Name on the report" />
       </section>
