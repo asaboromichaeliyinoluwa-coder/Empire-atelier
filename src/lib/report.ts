@@ -123,7 +123,7 @@ export async function buildReport(input: ReportInput): Promise<Blob> {
   doc.setTextColor(...C.cream);
   doc.setFont('times', 'normal');
   doc.setFontSize(30);
-  spaced('EMPIRE ATELIER', 310, 7);
+  spaced('EMPIRE GLAMOUR', 310, 7);
   doc.setFontSize(46);
   doc.setTextColor(...C.paper);
   doc.text('Personal Style', W / 2, 420, { align: 'center' });
@@ -147,7 +147,7 @@ export async function buildReport(input: ReportInput): Promise<Blob> {
     doc.setFontSize(8);
     doc.setTextColor(...C.muted);
     doc.setCharSpace(2);
-    doc.text('EMPIRE ATELIER  ·  PERSONAL STYLE REPORT', M, 36);
+    doc.text('EMPIRE GLAMOUR  ·  PERSONAL STYLE REPORT', M, 36);
     doc.text(name.toUpperCase(), W - M, 36, { align: 'right' });
     doc.setCharSpace(0);
     y = 80;
@@ -367,7 +367,7 @@ export async function buildReport(input: ReportInput): Promise<Blob> {
     y += 50;
   }
 
-  para('Prices are in US dollars and set by each seller. Retailer links open the seller’s own page; Empire Atelier tags them so sellers know you came from us.', 8.5, C.muted);
+  para('Prices are in US dollars and set by each seller. Retailer links open the seller’s own page; Empire Glamour tags them so sellers know you came from us.', 8.5, C.muted);
 
   // Page numbers on content pages.
   const pages = doc.getNumberOfPages();
