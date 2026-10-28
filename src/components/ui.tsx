@@ -129,7 +129,7 @@ export function OutboundLink({ url, sellerName, className = 'btn primary', child
       <Dialog open={demo} onClose={() => setDemo(false)} title={`${sellerName} is a demo seller`}>
         <p>
           This button sends shoppers to the seller’s own shop, tagged so the seller can see the
-          referral came from Empire Atelier.
+          referral came from Empire Glamour.
         </p>
         <p className="muted small">
           The link it would open: <code>{url}</code>. Replace the demo sellers’ website addresses in{' '}
