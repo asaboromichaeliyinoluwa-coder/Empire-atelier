@@ -42,7 +42,7 @@ export function ChatBubble() {
           <motion.section
             className="chat-pop"
             role="dialog"
-            aria-label="Empire Atelier stylist"
+            aria-label="Empire Glamour stylist"
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
@@ -61,7 +61,7 @@ export function ChatBubble() {
             <div className="chat-pop-log" aria-live="polite">
               <div className="msg assistant">
                 <div className="bubble">
-                  Hi{name ? ` ${name}` : ''}, I’m your Empire Atelier stylist ✦ How can I help you today?
+                  Hi{name ? ` ${name}` : ''}, I’m your Empire Glamour stylist ✦ How can I help you today?
                 </div>
               </div>
               {chat.length === 0 && (
