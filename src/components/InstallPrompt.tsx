@@ -74,7 +74,7 @@ export function InstallPrompt() {
         <motion.aside
           className="install-card"
           role="dialog"
-          aria-label="Install Empire Atelier"
+          aria-label="Install Empire Glamour"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
@@ -84,7 +84,7 @@ export function InstallPrompt() {
             <Star size={26} />
           </span>
           <div className="grow">
-            <strong>Get the Empire Atelier app</strong>
+            <strong>Get the Empire Glamour app</strong>
             {ios ? (
               <span className="small">
                 Tap <b>Share</b> <ShareGlyph /> then <b>Add to Home Screen</b>.
