@@ -74,7 +74,7 @@ export const CATEGORIES: { key: Category; label: string }[] = [
   { key: 'outerwear', label: 'Outerwear' },
   { key: 'shoes', label: 'Shoes' },
     { key: 'bags', label: 'Bags' },
-  { key: 'caps', label: 'Caps' },
+    { key: 'caps', label: 'Caps & beanies' },
   { key: 'belts', label: 'Belts' },
   { key: 'glasses', label: 'Glasses' },
   { key: 'accessories', label: 'Watches & jewellery' },
