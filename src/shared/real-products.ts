@@ -102,13 +102,13 @@ export const REAL_PRODUCTS: ShopProduct[] = [
     photos: ['real/tassel-chunky-loafers-1.webp', 'real/tassel-chunky-loafers-2.webp'], createdAt: 587,
   },
   {
-    id: 'real-camo-beanie', name: "Camo Knit Beanie", category: 'accessories', gender: 'unisex', price: 16,
+        id: 'real-camo-beanie', name: "Camo Knit Beanie", category: 'caps', gender: 'unisex', price: 20,
     description: "Soft camouflage-pattern knit beanie with a folded cuff.",
     material: "Acrylic knit", colorName: "Camo", colorHex: '#6b6a4c', sizes: ['One size'],
     photos: ['real/camo-beanie-1.webp', 'real/camo-beanie-2.webp'], createdAt: 586,
   },
   {
-    id: 'real-smiley-beanies', name: "Smiley Face Beanies", category: 'accessories', gender: 'unisex', price: 18,
+        id: 'real-smiley-beanies', name: "Smiley Face Beanies", category: 'caps', gender: 'unisex', price: 20,
     description: "Knit cuff beanies with an embroidered smiley-face patch, in black, white and cream.",
     material: "Acrylic knit", colorName: "Black / white / cream", colorHex: '#161616', sizes: ['One size'],
     photos: ['real/smiley-beanies-1.webp', 'real/smiley-beanies-2.webp'], createdAt: 585,
