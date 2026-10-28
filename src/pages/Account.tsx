@@ -114,7 +114,7 @@ export function SignIn() {
     <div className="container auth">
       <motion.section className="auth-art" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
         <Star size={44} />
-        <span className="eyebrow light">Empire Atelier membership</span>
+        <span className="eyebrow light">Empire Glamour membership</span>
         <h1 className="auth-title">Your wardrobe, <em>everywhere.</em></h1>
         <p>Free to join. Keep everything you love in one account and pick up on any phone or computer.</p>
         <ul className="perks">
@@ -294,7 +294,7 @@ function Dashboard() {
         <motion.div className="member-card" initial={{ rotateY: -12, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }} transition={{ duration: 0.8 }}>
           <div className="row between">
             <Star size={30} />
-            <span className="member-tier">Atelier member</span>
+            <span className="member-tier">Glamour member</span>
           </div>
           <span className="member-avatar">{initials}</span>
           <div>
