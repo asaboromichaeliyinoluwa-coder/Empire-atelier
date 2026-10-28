@@ -25,8 +25,11 @@ const SHOP_NAV: { label: string; to: string; dept?: Department; sale?: true }[] 
   { label: 'Dresses', to: '/shop?category=dresses' },
   { label: 'Sets', to: '/shop?category=sets' },
   { label: 'Shoes', to: '/shop?category=shoes' },
-  { label: 'Bags & travel', to: '/shop?category=bags' },
+    { label: 'Bags', to: '/shop?category=bags' },
   { label: 'Watches & jewellery', to: '/shop?category=accessories' },
+  { label: 'Caps', to: '/shop?category=caps' },
+  { label: 'Belts', to: '/shop?category=belts' },
+  { label: 'Glasses', to: '/shop?category=glasses' },
   { label: 'Luxury houses', to: '/shop?luxury=1' },
   { label: 'Sale', to: '/shop?sale=1', sale: true },
 ];
