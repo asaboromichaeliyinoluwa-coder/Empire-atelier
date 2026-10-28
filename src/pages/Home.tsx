@@ -125,7 +125,7 @@ export default function Home() {
             <HeroFigure />
             <div className="plaque">
               <Star size={34} />
-              <b>Empire Atelier</b>
+              <b>Empire Glamour</b>
               <small>Dress for the life you’re building</small>
             </div>
             <div className="hero-chip"><IconSparkle size={14} /> Powered by YouCam AI try-on</div>
