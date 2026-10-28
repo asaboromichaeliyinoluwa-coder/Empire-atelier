@@ -109,6 +109,8 @@ export async function askStylist(history: ChatTurn[], context: StylistContext): 
     await sleep(400);
     return offlineStylist(history[history.length - 1]?.text ?? '', context);
   }
+    const live = await getStatus().then((x) => x.stylist).catch(() => false);
+  if (!live) return offlineStylist(history[history.length - 1]?.text ?? '', context);
   const r = await json<{ reply: string }>('/api/stylist', { method: 'POST', body: JSON.stringify({ history, context }) });
   return r.reply;
 }
