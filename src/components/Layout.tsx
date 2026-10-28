@@ -84,11 +84,11 @@ export function DepartmentSwitch({ className = '' }: { className?: string }) {
 
 export function Brand({ className = '' }: { className?: string }) {
   return (
-    <Link to="/" className={`brand ${className}`} aria-label="Empire Atelier home">
+    <Link to="/" className={`brand ${className}`} aria-label="EMPIRE GLAMOUR home">
       <Star size={30} className="mark" />
       <span className="wordmark">
         <span>Empire</span>
-        <small>Atelier</small>
+                <small>Glamour</small>
       </span>
     </Link>
   );
@@ -275,7 +275,7 @@ export function Layout() {
           </nav>
         </div>
         <div className="footer-base">
-          <span>© {new Date().getFullYear()} Empire Atelier</span>
+          <span>© {new Date().getFullYear()} Empire Glamour</span>
           <span>Virtual try-on and clothes changer powered by YouCam AI · Stylist powered by Claude</span>
         </div>
       </footer>
