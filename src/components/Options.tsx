@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 import { productArt } from '../lib/art.ts';
 import {
-  CATEGORIES, COLORS, inDepartment, OCCASIONS, PRODUCTS, productById,
+    CATEGORIES, COLORS, inDepartment, OCCASIONS, PRODUCTS,
   type Category, type ColorFamily, type Department, type Occasion,
 } from '../shared/catalog.ts';
 import { IconCheck } from './icons.tsx';
@@ -37,10 +37,10 @@ export function OptionCard({
   );
 }
 
-const Art = ({ ids }: { ids: string[] }) => (
+const Art = ({ ids }: { ids: string[] }) => !ids.some((id) => PRODUCTS.some((x) => x.id === id)) ? <span className="ocard-glyph">✦</span> : (
   <span className={`ocard-art n${ids.length}`}>
     {ids.map((id) => {
-      const p = productById(id);
+             const p = PRODUCTS.find((x) => x.id === id);
       return p ? <img key={id} src={p.image ?? productArt(p)} alt="" draggable={false} /> : null;
     })}
   </span>
