@@ -160,7 +160,7 @@ export function Layout() {
   );
 
   return (
-    <div className="app" data-bg={background}>
+    <div className={gated ? "app is-gated" : "app"} data-bg={background}>
       <div className="backdrop" aria-hidden />
 
       <div className="promo-bar">
