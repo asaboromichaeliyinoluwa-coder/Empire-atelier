@@ -1477,3 +1477,19 @@ html, body {
 .hero-scene .hero-photo { position: relative; z-index: 1; width: min(92%, 440px); height: 100%; background-size: cover; background-position: center; border-radius: 220px 220px 14px 14px; box-shadow: 0 22px 40px rgba(50, 27, 19, 0.25); animation: none; }
 .style-card img { display: none; }
 .style-card::before { content: '✦'; display: block; font-size: 34px; line-height: 1; color: var(--gold-deep); text-align: center; padding: 30px 0 18px; }
+
+
+/* Sign-in page: centred card */
+.auth { display: block; max-width: 560px; margin: 0 auto; }
+.auth .auth-art { display: none; }
+.auth .auth-card { align-items: stretch; text-align: center; padding: 44px 40px 36px; border-radius: 32px; background: #fffdf9; box-shadow: 0 30px 70px rgba(10, 8, 6, 0.28); }
+.auth .auth-card::before { content: '✦'; align-self: center; display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: #f0dfc4; color: #8a6532; font-size: 30px; }
+.auth .auth-card .h2 { font-size: 36px; margin: 0; }
+.auth .auth-tabs { max-width: 320px; align-self: center; }
+.auth .social-btn, .auth .google-box { min-height: 56px; height: 56px; font-size: 17px; }
+.auth .field, .auth .field span { text-align: left; }
+
+/* Signed-out: show only the logo and the sign-in card */
+.is-gated .promo-bar, .is-gated .shopnav, .is-gated .header-tools, .is-gated .mobile-search, .is-gated .atelier-bar, .is-gated .site-footer, .is-gated .tabbar, .is-gated .chat-bubble, .is-gated .install-card, .is-gated .gate-head { display: none !important; }
+.is-gated .topbar { justify-content: center; }
+.is-gated .page { padding-top: 24px; padding-bottom: 60px; }
