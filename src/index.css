@@ -1475,3 +1475,5 @@ html, body {
 .footer { background: #0a0806; color: #b3a283; }
 .footer a, .footer-links { color: #d4af6a !important; }
 .hero-scene .hero-photo { position: relative; z-index: 1; width: min(92%, 440px); height: 100%; background-size: cover; background-position: center; border-radius: 220px 220px 14px 14px; box-shadow: 0 22px 40px rgba(50, 27, 19, 0.25); animation: none; }
+.style-card img { display: none; }
+.style-card::before { content: '✦'; display: block; font-size: 34px; line-height: 1; color: var(--gold-deep); text-align: center; padding: 30px 0 18px; }
