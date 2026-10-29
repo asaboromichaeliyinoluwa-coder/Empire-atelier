@@ -8,7 +8,7 @@ import { productArt } from './art.ts';
 import { loadImage } from './images.ts';
 import { detectBody, type Body, type Pt } from './pose.ts';
 
-export type Fit = { size: number; lift: number };
+export type Fit = { size: number; lift: number; len?: number };
 export const DEFAULT_FIT: Fit = { size: 1, lift: 0 };
 
 const mid = (a: Pt, b: Pt) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
@@ -93,7 +93,8 @@ export async function composeTryOn(photo: string, products: Product[], fit: Fit 
         sy = Math.max(0.7, Math.min(1.6, (legPx * (a.reach ?? 1)) / ((a.bottom - from[0].y) * 0.97) / sx));
       }
     }
-    const scale = dist(...to) / dist(...from);
+    const scale = dist(...to) / dist(...from);  
+    sy *= fit.len ?? 1;
     const angle = Math.atan2(to[1].y - to[0].y, to[1].x - to[0].x);
     const fm = mid(...from), tm = mid(...to);
 
