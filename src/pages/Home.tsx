@@ -237,7 +237,7 @@ export default function Home() {
         </section>
 
         {/* ---------- The Maison edit ---------- */}
-        <section className="maison">
+                <section className="maison" style={maisonItems.length ? undefined : { display: 'none' }}>
           <div className="maison-intro">
             <span className="eyebrow light">The Maison edit</span>
             <h2 className="maison-title">Luxury, <em>reimagined</em></h2>
@@ -254,7 +254,7 @@ export default function Home() {
         </section>
 
         {/* ---------- The houses ---------- */}
-        <section className="stack gap-20">
+                <section className="stack gap-20" style={PRODUCTS.some((p) => HOUSES.some((h) => h.id === p.sellerId)) ? undefined : { display: 'none' }}>
           <SectionHead title="The luxury houses" sub="Six original labels, each with its own materials and mood." to="/shop?luxury=1" />
           <div className="house-grid">
             {HOUSES.map((h) => {
