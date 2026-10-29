@@ -22,6 +22,10 @@ const PICK_TABS: { key: Category; label: string }[] = [
 ];
 
 /** One dress, or one top and one bottom, plus one layer. Shoes and bags ride along for the look. */
+const SIZE_SCALE: Record<string, number> = { S: 0.9, M: 0.95, L: 1, XL: 1.07, XXL: 1.14, XXXL: 1.21 };
+/** Length in inches, five steps per garment type; the middle one is the standard length. */
+const LENGTHS = { top: [24, 26, 28, 30, 32], bottom: [36, 38, 40, 42, 44], full: [44, 48, 52, 56, 60] };
+
 function addPiece(items: Product[], p: Product): Product[] {
   const keep = items.filter((x) => {
     if (x.id === p.id) return false;
@@ -48,14 +52,18 @@ export default function TryOn() {
   const tabs = PICK_TABS.filter((t) => PRODUCTS.some((p) => p.garment && p.category === t.key && inDepartment(p, department)));
   const [tab, setTab] = useState<Category>(items.find((p) => p.garment)?.category ?? (department === 'men' ? 'tops' : 'dresses'));
   const shownTab = tabs.some((t) => t.key === tab) ? tab : tabs[0]?.key ?? 'tops';
-  const [fit, setFit] = useState<Fit>(DEFAULT_FIT);
+    const [fit, setFit] = useState<Fit>(DEFAULT_FIT);
+  const [size, setSize] = useState('M');
+  const [lenIdx, setLenIdx] = useState(2);
   const [preview, setPreview] = useState<{ image: string; tracked: boolean }>();
   const [render, setRender] = useState<{ key: string; url: string }>();
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
   const [savedId, setSavedId] = useState<string>();
 
-  const wearable = items.filter((p) => p.garment);
+    const wearable = items.filter((p) => p.garment);
+  const lenKind = wearable.some((p) => p.garment === 'full_body') ? 'full' : wearable.some((p) => p.garment === 'upper_body') ? 'top' : 'bottom';
+  const lengthIn = LENGTHS[lenKind][lenIdx];
   const key = `${photo?.length}:${wearable.map((p) => p.id).join(',')}`;
   const photoReal = render?.key === key ? render.url : undefined;
   const result = photoReal ?? preview?.image;
@@ -65,14 +73,14 @@ export default function TryOn() {
     if (!photo) return;
     let live = true;
     setError(undefined);
-    composeTryOn(photo, wearable, fit)
+        composeTryOn(photo, wearable, { ...fit, size: fit.size * SIZE_SCALE[size], len: 1 + (lenIdx - 2) * 0.07 })
       .then((r) => live && setPreview(r))
       .catch(() => live && setError('This photo could not be read. Try another one.'));
     return () => {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photo, key, fit]);
+    }, [photo, key, fit, size, lenIdx]);
 
   useEffect(() => setSavedId(undefined), [key]);
 
@@ -108,7 +116,7 @@ export default function TryOn() {
     } catch {
       image = undefined; // A remote render that can't be read back: save the look without it.
     }
-    const look = app.saveLook({ name: `${items[0].name} look`, itemIds: items.map((p) => p.id), image });
+        const look = app.saveLook({ name: `${items[0].name} look (${size}, ${lengthIn} in)`, itemIds: items.map((p) => p.id), image });
     setSavedId(look.id);
   };
 
@@ -192,8 +200,23 @@ export default function TryOn() {
                   </label>
                 </div>
               )}
-
-              <div className="row gap-8 wrap">
+                            {wearable.length > 0 && (
+                <div className="stack gap-12">
+                  <div>
+                    <span className="small muted">Size</span>
+                    <div className="chips">
+                      {Object.keys(SIZE_SCALE).map((s) => <button key={s} className={`chip ${size === s ? 'on' : ''}`} onClick={() => setSize(s)}>{s}</button>)}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="small muted">Length (inches)</span>
+                    <div className="chips">
+                      {LENGTHS[lenKind].map((n, i) => <button key={n} className={`chip ${lenIdx === i ? 'on' : ''}`} onClick={() => setLenIdx(i)}>{n}</button>)}
+                    </div>
+                  </div>
+                </div>
+              )}
+               <div className="row gap-8 wrap">
                 {status?.youcam && wearable.length > 0 && !photoReal && (
                   <button className="btn primary" onClick={renderYouCam} disabled={!!busy}>
                     <IconSparkle size={16} /> Render with YouCam
