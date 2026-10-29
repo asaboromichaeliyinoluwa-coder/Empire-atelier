@@ -122,7 +122,7 @@ export default function Home() {
           <motion.div className="hero-scene" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.1 }}>
             <LeafShadow />
             <div className="scene-arch" />
-            <HeroFigure />
+                        <div className="hero-photo" role="img" aria-label="Empire Glamour collection" style={{ backgroundImage: 'url(/real/hero-mannequins.png)' }} />
             <div className="plaque">
               <Star size={34} />
               <b>Empire Glamour</b>
@@ -379,7 +379,7 @@ function LeafShadow() {
 }
 
 /** Dress form and suit form, for womenswear and menswear. */
-function HeroFigure() {
+export function HeroFigure() {
   return (
     <svg viewBox="0 0 200 300" className="hero-figure" aria-hidden>
       <defs>
