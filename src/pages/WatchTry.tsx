@@ -41,6 +41,8 @@ export default function WatchTry() {
   const [result, setResult] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
+  const [manual, setManual] = useState(false);
+  const [fit, setFit] = useState({ x: 50, y: 50, size: 35, rot: 0 });
 
   const run = async () => {
     if (!watch || !photo) return;
@@ -89,13 +91,29 @@ export default function WatchTry() {
           <button className="btn primary" onClick={run} disabled={!watch || busy || status?.youcam === false}>
             {busy ? 'Fitting the watch…' : watch ? `Try on ${watch.name}` : 'Choose a watch first'}
           </button>
-          <button className="btn text" onClick={() => { setPhoto(undefined); setResult(undefined); }}>Change photo</button>
+          <button className="btn ghost" onClick={() => { setManual(true); setResult(undefined); setError(undefined); }} disabled={!watch}>Place it myself</button>
+          <button className="btn text" onClick={() => { setPhoto(undefined); setResult(undefined); setManual(false); }}>Change photo</button>
         </div>
       ) : (
         <PhotoPicker onPhoto={(p) => downscale(p, 1100, 0.88).then(setPhoto).catch(() => setPhoto(p))} />
       )}
 
-           {photo && !result && createElement('img', { src: photo, alt: 'Your wrist photo', style: { maxWidth: 360, width: '100%', borderRadius: 16 } })}
+      {photo && !result && !manual && createElement('img', { src: photo, alt: 'Your wrist photo', style: { maxWidth: 360, width: '100%', borderRadius: 16 } })}
+      {photo && watch && manual && (
+        <div className="stack gap-12" style={{ maxWidth: 420 }}>
+          <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden' }}>
+            {createElement('img', { src: photo, alt: 'Your wrist photo', style: { width: '100%', display: 'block' } })}
+            {createElement('img', { src: watch.image, alt: watch.name, style: { position: 'absolute', left: `${fit.x}%`, top: `${fit.y}%`, width: `${fit.size}%`, transform: `translate(-50%, -50%) rotate(${fit.rot}deg)`, mixBlendMode: 'multiply', pointerEvents: 'none' } })}
+          </div>
+          {([['x', 'Left or right', 0, 100], ['y', 'Up or down', 0, 100], ['size', 'Size', 10, 80], ['rot', 'Turn', -180, 180]] as const).map(([k, label, min, max]) => (
+            <label key={k} className="stack gap-4">
+              <span className="small muted">{label}</span>
+              {createElement('input', { type: 'range', min, max, step: 1, value: fit[k], onChange: (e: { target: { value: string } }) => setFit({ ...fit, [k]: Number(e.target.value) }) })}
+            </label>
+          ))}
+          <p className="small muted">Move the sliders until the watch sits on your wrist. This is a simple preview, not a photo-real render.</p>
+        </div>
+      )}
       {error && <div className="error">{error.includes('correct pose') ? 'YouCam could not see your wrist clearly. Use a photo of the back of your hand and wrist, palm down, all five fingers visible, nothing covering it, in good light.' : error}</div>}
       {photo && result && <BeforeAfter before={photo} after={result} label="YouCam" />}
     </div>
