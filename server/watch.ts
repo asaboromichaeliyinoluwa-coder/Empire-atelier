@@ -64,7 +64,7 @@ export type WatchResult = { status: 'running' } | { status: 'error'; error: stri
 
 export async function getWatchTask(taskId: string): Promise<WatchResult> {
   const t = await call<{ task_status: string; error?: string | null; results?: any }>(`${WATCH_PATH}/${encodeURIComponent(taskId)}`);
-  if (t.task_status === 'error') return { status: 'error', error: t.error || 'YouCam could not complete this try-on' };
+    if (t.task_status === 'error') return { status: 'error', error: `YouCam could not complete this try-on: ${JSON.stringify(t)}` };
   if (t.task_status !== 'success') return { status: 'running' };
   const r = t.results;
   const url = r?.url ?? r?.output_url ?? (Array.isArray(r) ? r[0]?.url : undefined) ?? r?.images?.[0]?.url;
