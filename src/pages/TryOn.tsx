@@ -205,13 +205,13 @@ export default function TryOn() {
                   <div>
                     <span className="small muted">Size</span>
                     <div className="chips">
-                      {Object.keys(SIZE_SCALE).map((s) => <button key={s} className={`chip ${size === s ? 'on' : ''}`} onClick={() => setSize(s)}>{s}</button>)}
+                      {Object.keys(SIZE_SCALE).map((s) => <button key={s} className={`chip ${size === s ? 'on' : ''}`} onClick={() => { setSize(s); setRender(undefined); }}>{s}</button>)}
                     </div>
                   </div>
                   <div>
                     <span className="small muted">Length (inches)</span>
                     <div className="chips">
-                      {LENGTHS[lenKind].map((n, i) => <button key={n} className={`chip ${lenIdx === i ? 'on' : ''}`} onClick={() => setLenIdx(i)}>{n}</button>)}
+                        {LENGTHS[lenKind].map((n, i) => <button key={n} className={`chip ${lenIdx === i ? 'on' : ''}`} onClick={() => { setLenIdx(i); setRender(undefined); }}>{n}</button>)}
                     </div>
                   </div>
                 </div>
