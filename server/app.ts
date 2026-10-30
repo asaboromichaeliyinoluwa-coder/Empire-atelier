@@ -10,6 +10,7 @@ import { cleanContext } from '../src/shared/stylist.ts';
 import { AccountError, accountsMode, deleteAccount, googleLogin, loadData, logIn, me, phoneStart, phoneVerify, providers, saveData, signUp, updateProfile } from './accounts.ts';
 import { claimShop, deleteProduct, ownerStatus, publicShop, saveProduct, saveSettings, sendPhoto } from './shop.ts';
 import { askStylist, stylistConfigured } from './stylist.ts';
+import { createWatchTryOn, getWatchTask } from './watch.ts';
 import { createTemplateChange, createTryOn, getTask, listTemplates, youcamConfigured, YouCamError, type ImageInput } from './youcam.ts';
 
 const MAX_BODY = 15 * 1024 * 1024;
@@ -106,7 +107,13 @@ const garmentImage = product?.tryOnImage && /^https:\/\//.test(product.tryOnImag
     if (!youcamConfigured()) return send(res, 200, { demo: true });
     return send(res, 200, { taskId: await createTryOn(source, garmentImage, garment) });
   }
-
+  if (req.method === 'POST' && path === '/api/watch') {
+    const body = await readJson(req);
+    if (!youcamConfigured()) return send(res, 200, { demo: true });
+    return send(res, 200, { taskId: await createWatchTryOn(validImage(body.source), validImage(body.watchImage)) });
+  }
+  const watchTask = /^\/api\/watch\/task\/([^/]+)$/.exec(path);
+  if (req.method === 'GET' && watchTask) return send(res, 200, await getWatchTask(decodeURIComponent(watchTask[1])));
   const task = /^\/api\/task\/([^/]+)$/.exec(path);
   if (req.method === 'GET' && task) return send(res, 200, await getTask(decodeURIComponent(task[1])));
 
