@@ -161,11 +161,7 @@ export default function ProductPage() {
                 <IconSparkle size={16} /> Try it on
               </button>
             )}
-                        {product.category === 'accessories' && (
-              <button className="btn primary" onClick={() => navigate('/watch')}>
-                <IconSparkle size={16} /> Try on your wrist
-              </button>
-            )}
+                      
             <RetailerButton product={product} className={product.garment || product.category === 'accessories' ? 'btn ghost' : 'btn primary'} />
             <BagButton product={product} />
           </div>
