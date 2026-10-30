@@ -95,7 +95,8 @@ export default function WatchTry() {
         <PhotoPicker onPhoto={(p) => downscale(p, 1100, 0.88).then(setPhoto).catch(() => setPhoto(p))} />
       )}
 
-      {error && <div className="error">{error}</div>}
+           {photo && !result && createElement('img', { src: photo, alt: 'Your wrist photo', style: { maxWidth: 360, width: '100%', borderRadius: 16 } })}
+      {error && <div className="error">{error.includes('correct pose') ? 'YouCam could not see your wrist clearly. Use a photo of the back of your hand and wrist, palm down, all five fingers visible, nothing covering it, in good light.' : error}</div>}
       {photo && result && <BeforeAfter before={photo} after={result} label="YouCam" />}
     </div>
   );
