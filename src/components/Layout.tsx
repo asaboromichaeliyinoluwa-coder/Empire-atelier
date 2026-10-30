@@ -47,7 +47,8 @@ const navListed = (n: (typeof SHOP_NAV)[number]) => {
 /** The AI atelier tools, one click away on every page. */
 const TOOLS = [
   { to: '/try-on', label: 'Virtual try-on', Icon: IconSparkle },
-  { to: '/changer', label: 'Clothes changer', Icon: IconWand },
+    { to: '/changer', label: 'Clothes changer', Icon: IconWand },
+  { to: '/watch', label: 'Watch try-on', Icon: IconSparkle },
   { to: '/outfits', label: 'Outfits', Icon: IconHanger },
   { to: '/planner', label: 'Outfit planner', Icon: IconCalendar },
   { to: '/stylist', label: 'AI stylist', Icon: IconChat },
