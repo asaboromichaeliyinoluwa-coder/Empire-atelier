@@ -1,38 +1,25 @@
-import { useRef, useState } from 'react';
+import { createElement } from 'react';
 
-/** Drag to compare the original photo with the try-on render. */
+/** The original photo and the try-on render side by side, so customers can compare. */
 export function BeforeAfter({ before, after, label = 'Try-on' }: { before: string; after: string; label?: string }) {
-  const [pos, setPos] = useState(50);
-  const ref = useRef<HTMLDivElement>(null);
-  const move = (clientX: number) => {
-    const r = ref.current!.getBoundingClientRect();
-    setPos(Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100)));
-  };
+  const side = { display: 'grid', gap: 10, justifyItems: 'center', minWidth: 0 } as const;
+  const title = { margin: 0, fontSize: 20, letterSpacing: '0.12em', textTransform: 'uppercase' } as const;
+  const frame = { width: '100%', aspectRatio: '3 / 4', borderRadius: 16, background: 'var(--cream)', display: 'grid', placeItems: 'center', overflow: 'hidden' } as const;
+  const photo = (src: string, alt: string) =>
+    createElement('img', { src, alt, draggable: false, style: { width: '100%', height: '100%', objectFit: 'contain' } });
   return (
-    <div
-      ref={ref}
-      className="cam"
-      style={{ touchAction: 'pan-y', cursor: 'ew-resize', userSelect: 'none' }}
-      onPointerDown={(e) => {
-        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-        move(e.clientX);
-      }}
-      onPointerMove={(e) => e.buttons && move(e.clientX)}
-    >
-      <img className="still" src={after} alt={label} draggable={false} />
-      <img className="still" src={before} alt="Original" draggable={false} style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }} />
-      <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${pos}%`, width: 1, background: 'var(--gold)' }}>
-        <div
-          style={{
-            position: 'absolute', top: '50%', left: -18, width: 36, height: 36, marginTop: -18, borderRadius: '50%',
-            background: 'var(--gold)', color: 'var(--matte)', display: 'grid', placeItems: 'center', fontSize: 14,
-          }}
-        >
-          ⟷
+    <div style={{ display: 'grid', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={side}>
+          <h3 style={title}>Before</h3>
+          <div style={frame}>{photo(before, 'Original')}</div>
+        </div>
+        <div style={side}>
+          <h3 style={title}>✦ After</h3>
+          <div style={frame}>{photo(after, label)}</div>
         </div>
       </div>
-      <span className="badge" style={{ position: 'absolute', left: 12, top: 12 }}>Before</span>
-      <span className="badge" style={{ position: 'absolute', right: 12, top: 12 }}>{label}</span>
+      <p className="small muted" style={{ margin: 0, textAlign: 'center' }}>Rendered by {label} AI</p>
     </div>
   );
 }
