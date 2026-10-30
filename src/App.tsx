@@ -20,7 +20,6 @@ const Stylist = lazy(() => import('./pages/Stylist.tsx'));
 const Changer = lazy(() => import('./pages/Changer.tsx'));
 const Report = lazy(() => import('./pages/Report.tsx'));
 const Bag = lazy(() => import('./pages/Bag.tsx'));
-const WatchTry = lazy(() => import('./pages/WatchTry.tsx'));
 const Account = lazy(() => import('./pages/Account.tsx'));
 
 const wrap = (el: React.ReactNode) => (
@@ -46,7 +45,6 @@ const router = (IS_PREVIEW ? createMemoryRouter : createBrowserRouter)([
       { path: '/stylist', element: wrap(<Stylist />) },
       { path: '/changer', element: wrap(<Changer />) },
       { path: '/report', element: wrap(<Report />) },
-      { path: '/watch', element: wrap(<WatchTry />) },
       { path: '/bag', element: wrap(<Bag />) },
       { path: '/admin', element: wrap(<Admin />) },
       { path: '/account', element: wrap(<Account />) },
