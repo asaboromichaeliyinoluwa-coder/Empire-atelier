@@ -49,7 +49,12 @@ async function imageField(prefix: 'src' | 'ref', input: ImageInput, plural = fal
 }
 
 export async function createWatchTryOn(wrist: ImageInput, watch: ImageInput) {
-  const payload = { ...(await imageField('src', wrist)), ...(await imageField('ref', watch, true)) };
+    const src = await imageField('src', wrist);
+  const ref = await imageField('ref', watch, true);
+  // YouCam also wants the same file id or url once more, under source_info and object_infos.
+  const srcName = String(Object.values(src)[0]);
+  const refName = String((Object.values(ref)[0] as string[])[0]);
+  const payload = { ...src, ...ref, source_info: { name: srcName }, object_infos: [{ name: refName, parameter: { watch_need_remove_background: true } }] };
   const { task_id } = await call<{ task_id: string }>(WATCH_PATH, { method: 'POST', body: JSON.stringify(payload) });
   if (!task_id) throw new YouCamError('YouCam returned no task id');
   return task_id;
